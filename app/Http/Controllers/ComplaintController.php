@@ -29,7 +29,7 @@ class ComplaintController extends Controller
                             })
                             ->latest()
                             ->paginate(10)->withQueryString(); // <--- UBAH DI SINI
-                            
+
             return view('complaints.index_pengguna', compact('complaints'));
         }
 
@@ -52,7 +52,7 @@ class ComplaintController extends Controller
                             })
                             ->latest()
                             ->paginate(10)->withQueryString(); // <--- UBAH DI SINI
-                            
+
             return view('complaints.index_cc', compact('complaints', 'totalAduan', 'menunggu', 'diproses', 'selesai'));
         }
 
@@ -69,7 +69,7 @@ class ComplaintController extends Controller
                             })
                             ->latest()
                             ->paginate(10)->withQueryString(); // <--- UBAH DI SINI
-                            
+
             return view('complaints.index_kadiv', compact('complaints'));
         }
 
@@ -81,7 +81,7 @@ class ComplaintController extends Controller
     {
         // Mengambil daftar kategori untuk ditampilkan di pilihan (dropdown) form
         $categories = Category::all();
-        
+
         return view('complaints.create', compact('categories'));
     }
 
@@ -95,7 +95,7 @@ class ComplaintController extends Controller
             'bus_number'    => 'nullable|string|max:50',
             'description'   => 'required|string',
             // UBAH: evidence sekarang nullable (opsional)
-            'evidence'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048', 
+            'evidence'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ], [
             'evidence.image' => 'File bukti harus berupa gambar.',
             'evidence.max'   => 'Ukuran foto maksimal adalah 2MB.',
@@ -111,14 +111,14 @@ class ComplaintController extends Controller
 
         Complaint::create([
             'ticket_number' => $ticketNumber,
-            'user_id'       => \Illuminate\Support\Facades\Auth::id(), 
+            'user_id'       => \Illuminate\Support\Facades\Auth::id(),
             'category_id'   => $validatedData['category_id'],
             'title'         => $validatedData['title'],
             'description'   => $validatedData['description'],
             'incident_time' => $validatedData['incident_time'],
             'bus_number'    => $validatedData['bus_number'] ?? null,
             'evidence_path' => $evidencePath, // Akan terisi path atau tetap null
-            'status'        => 'menunggu', 
+            'status'        => 'menunggu',
         ]);
 
         return redirect()->route('complaints.index')
@@ -151,7 +151,7 @@ class ComplaintController extends Controller
         // Validasi input dari CC Room (Tambahkan 'selesai')
         $validatedData = $request->validate([
             'status' => 'required|in:menunggu,diproses,ditolak,selesai',
-            'division_id' => 'nullable|exists:divisions,id', 
+            'division_id' => 'nullable|exists:divisions,id',
         ]);
 
         // Cek jika status diubah menjadi 'diproses', pastikan Divisi sudah dipilih
@@ -242,7 +242,7 @@ class ComplaintController extends Controller
     public function feedback($id)
     {
         $complaint = Complaint::where('user_id', Auth::id())->where('status', 'selesai')->findOrFail($id);
-        
+
         // Jika sudah pernah memberi ulasan, kembalikan
         if (\App\Models\Feedback::where('complaint_id', $id)->exists()) {
             return redirect()->route('complaints.index')->with('success', 'Anda sudah memberikan ulasan untuk tiket ini.');
@@ -267,5 +267,31 @@ class ComplaintController extends Controller
         ]);
 
         return redirect()->route('complaints.index')->with('success', 'Terima kasih! Ulasan Anda sangat berarti bagi layanan Trans Semarang.');
+    }
+
+    public function store_resolve(Request $request, $id)
+    {
+        $request->validate([
+            'resolution_notes' => 'required|string',
+            'resolution_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $complaint = Complaint::findOrFail($id);
+
+        // Proses upload file foto bukti
+        if ($request->hasFile('resolution_proof')) {
+            $file = $request->file('resolution_proof');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('proofs', $filename, 'public');
+
+            $complaint->resolution_proof = $filename;
+        }
+
+        // Simpan catatan perbaikan dan ubah status ke validasi akhir
+        $complaint->resolution_notes = $request->resolution_notes;
+        $complaint->status = 'menunggu_validasi_cc';
+        $complaint->save();
+
+        return redirect()->route('complaints.index')->with('success', 'Bukti penyelesaian berhasil dikirim. Menunggu validasi CC Room.');
     }
 }

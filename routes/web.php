@@ -22,13 +22,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/aduan', [ComplaintController::class, 'index'])->name('complaints.index');
     Route::get('/aduan/buat', [ComplaintController::class, 'create'])->name('complaints.create');
     Route::post('/aduan', [ComplaintController::class, 'store'])->name('complaints.store');
-    
+
     // Rute Detail & Update
-    Route::get('/aduan/{id}', [ComplaintController::class, 'show'])->name('complaints.show');   
+    Route::get('/aduan/{id}', [ComplaintController::class, 'show'])->name('complaints.show');
     Route::put('/aduan/{id}', [ComplaintController::class, 'update'])->name('complaints.update');
 
     // Rute Tindak Lanjut Kadiv
     Route::get('/aduan/{id}/tindak-lanjut', [ComplaintController::class, 'resolve'])->name('complaints.resolve');
+    Route::put('/complaints/{id}/store-resolve', [App\Http\Controllers\ComplaintController::class, 'store_resolve'])->name('complaints.store_resolve');
     Route::put('/aduan/{id}/tindak-lanjut', [ComplaintController::class, 'storeResolution'])->name('complaints.store_resolution');
 
     // Rute Ulasan

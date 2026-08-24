@@ -29,10 +29,27 @@
                     @auth
                         <a href="{{ url('/dashboard') }}" class="font-semibold text-red-700 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition">Dashboard Saya &rarr;</a>
                     @else
-                        <a href="{{ route('login') }}" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition">Masuk</a>
+                        <a
+                            href="{{ route('login') }}"
+                            class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition"
+                        >
+                            Login Pengguna
+                        </a>
+
+                        <a
+                            href="{{ route('internal.login') }}"
+                            class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition"
+                        >
+                            Login Internal
+                        </a>
 
                         @if (Route::has('register'))
-                            <a href="{{ route('register') }}" class="font-semibold px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition shadow-sm">Daftar Akun</a>
+                            <a
+                                href="{{ route('register') }}"
+                                class="font-semibold px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition shadow-sm"
+                            >
+                                Daftar Akun
+                            </a>
                         @endif
                     @endauth
                 </div>

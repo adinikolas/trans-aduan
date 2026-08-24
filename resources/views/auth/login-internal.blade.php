@@ -1,21 +1,21 @@
 <x-guest-layout>
     <div class="mb-6 text-center">
         <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-            Login Pengguna Umum
+            Login Internal
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            Masuk untuk membuat dan memantau laporan aduan Anda.
+            CC Room dan Manager
         </p>
     </div>
 
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('internal.login.store') }}">
         @csrf
 
-        <!-- Email Address -->
+        <!-- Email -->
         <div>
             <x-input-label for="email" :value="__('Email')" />
 
@@ -61,7 +61,7 @@
                 <input
                     id="remember_me"
                     type="checkbox"
-                    class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800"
+                    class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-red-600 shadow-sm focus:ring-red-500"
                     name="remember"
                 >
 
@@ -71,10 +71,11 @@
             </label>
         </div>
 
+        <!-- Submit -->
         <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
                 <a
-                    class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                    class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                     href="{{ route('password.request') }}"
                 >
                     {{ __('Forgot your password?') }}
@@ -87,17 +88,44 @@
         </div>
     </form>
 
-    <!-- Login Internal -->
-    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
+    <!-- Role Information -->
+    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+        <p class="text-xs text-center text-gray-500 dark:text-gray-400 mb-3">
+            Login ini digunakan oleh:
+        </p>
+
+        <div class="grid grid-cols-1 gap-2">
+            <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-3 text-center">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    CC Room
+                </span>
+            </div>
+
+            <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-3 text-center">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Manager Keuangan
+                </span>
+            </div>
+
+            <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-3 text-center">
+                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Manager Operasional
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Public Login -->
+    <div class="mt-6 text-center">
         <p class="text-sm text-gray-600 dark:text-gray-400">
-            Anda merupakan pengguna internal?
+            Anda pengguna umum?
         </p>
 
         <a
-            href="{{ route('internal.login') }}"
+            href="{{ route('login') }}"
             class="inline-block mt-2 text-sm font-semibold text-red-700 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
         >
-            Login CC Room / Manager →
+            Login Pengguna Umum →
         </a>
     </div>
 

@@ -31,7 +31,8 @@ class User extends Authenticatable
         ];
     }
 
-    // Relasi ke Divisi (Jika dia Kadiv)
+    // Relasi ke Divisi.
+    // Tetap dipertahankan karena aduan masih memiliki division_id.
     public function division()
     {
         return $this->belongsTo(Division::class);

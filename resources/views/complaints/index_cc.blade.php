@@ -1,13 +1,13 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dashboard CC Room - Menunggu Tindakan') }}
+            {{ __('Dashboard CC Room') }}
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            
+
             <!-- 1. WIDGET STATISTIK DASHBOARD -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <!-- Kotak Total Aduan -->
@@ -67,17 +67,17 @@
             <!-- 2. PANEL PENCARIAN & FILTER -->
             <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <form method="GET" action="{{ route('complaints.index') }}" class="flex flex-col sm:flex-row gap-4">
-                    
+
                     <div class="flex-1">
                         <label for="search" class="sr-only">Cari Tiket</label>
-                        <input type="text" name="search" id="search" value="{{ request('search') }}" 
-                            placeholder="Cari No. Tiket atau Judul Laporan..." 
+                        <input type="text" name="search" id="search" value="{{ request('search') }}"
+                            placeholder="Cari No. Tiket atau Judul Laporan..."
                             class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition duration-150">
                     </div>
 
                     <div class="sm:w-48">
                         <label for="status" class="sr-only">Filter Status</label>
-                        <select name="status" id="status" 
+                        <select name="status" id="status"
                             class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition duration-150">
                             <option value="">Semua Status</option>
                             <option value="menunggu" {{ request('status') == 'menunggu' ? 'selected' : '' }}>Menunggu Verifikasi</option>
@@ -92,7 +92,7 @@
                         <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white text-sm font-semibold rounded-md shadow-sm transition">
                             Terapkan
                         </button>
-                        
+
                         @if(request('search') || request('status'))
                             <a href="{{ route('complaints.index') }}" class="w-full sm:w-auto px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-sm font-semibold rounded-md shadow-sm transition text-center flex items-center justify-center">
                                 Reset
@@ -106,7 +106,7 @@
             <!-- 3. TABEL DATA -->
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-0 sm:p-6 text-gray-900 dark:text-gray-100 overflow-x-auto">
-                    
+
                     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                         <thead class="bg-gray-50 dark:bg-gray-700/50">
                             <tr>

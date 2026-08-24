@@ -12,15 +12,47 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Membuat HANYA 1 Data Divisi (Sesuai Rancangan Anda)
-        $divUtama = Division::create(['name' => 'Kepala Divisi']);
+        /*
+        |--------------------------------------------------------------------------
+        | 1. Membuat Divisi
+        |--------------------------------------------------------------------------
+        |
+        | Untuk sementara struktur divisi tetap menggunakan satu divisi
+        | yang sudah ada pada rancangan aplikasi.
+        |
+        | Nama "Kepala Divisi" diubah menjadi "Operasional" karena
+        | role Kadiv sudah tidak digunakan.
+        |
+        */
+        $divUtama = Division::create([
+            'name' => 'Operasional'
+        ]);
 
-        // 2. Semua Kategori dimasukkan ke 1 Divisi tersebut
-        Category::create(['name' => 'Perilaku Pengemudi', 'division_id' => $divUtama->id]);
-        Category::create(['name' => 'Fasilitas Halte Rusak', 'division_id' => $divUtama->id]);
-        Category::create(['name' => 'Kondisi Armada (AC Mati, dll)', 'division_id' => $divUtama->id]);
+        /*
+        |--------------------------------------------------------------------------
+        | 2. Kategori Aduan
+        |--------------------------------------------------------------------------
+        */
+        Category::create([
+            'name' => 'Perilaku Pengemudi',
+            'division_id' => $divUtama->id
+        ]);
 
-        // 3. Membuat Akun Pengguna Jasa (Masyarakat)
+        Category::create([
+            'name' => 'Fasilitas Halte Rusak',
+            'division_id' => $divUtama->id
+        ]);
+
+        Category::create([
+            'name' => 'Kondisi Armada (AC Mati, dll)',
+            'division_id' => $divUtama->id
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. Akun Pengguna Umum
+        |--------------------------------------------------------------------------
+        */
         User::create([
             'name' => 'Budi Penumpang',
             'email' => 'budi@gmail.com',
@@ -28,7 +60,11 @@ class DatabaseSeeder extends Seeder
             'role' => 'pengguna',
         ]);
 
-        // 4. Membuat Akun CC Room
+        /*
+        |--------------------------------------------------------------------------
+        | 4. Akun CC Room
+        |--------------------------------------------------------------------------
+        */
         User::create([
             'name' => 'Admin CC Room',
             'email' => 'cc@trans.com',
@@ -36,13 +72,28 @@ class DatabaseSeeder extends Seeder
             'role' => 'cc_room',
         ]);
 
-        // 5. Membuat Akun Kepala Divisi
+        /*
+        |--------------------------------------------------------------------------
+        | 5. Akun Manager Keuangan
+        |--------------------------------------------------------------------------
+        */
         User::create([
-            'name' => 'Kepala Divisi',
-            'email' => 'kadiv@trans.com',
+            'name' => 'Manager Keuangan',
+            'email' => 'manager.keuangan@trans.com',
             'password' => Hash::make('password123'),
-            'role' => 'kadiv',
-            'division_id' => $divUtama->id, 
+            'role' => 'manager_keuangan',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | 6. Akun Manager Operasional
+        |--------------------------------------------------------------------------
+        */
+        User::create([
+            'name' => 'Manager Operasional',
+            'email' => 'manager.operasional@trans.com',
+            'password' => Hash::make('password123'),
+            'role' => 'manager_operasional',
         ]);
     }
 }

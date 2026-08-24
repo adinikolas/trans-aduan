@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login view.
+     * Display the public user login view.
      */
     public function create(): View
     {
@@ -20,15 +20,55 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Display the internal login page.
+     *
+     * Internal users:
+     * - CC Room
+     * - Manager Keuangan
+     * - Manager Operasional
+     */
+    public function createInternal(): View
+    {
+        return view('auth.login-internal');
+    }
+
+    /**
+     * Handle login for public users only.
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        $request->authenticate([
+            'pengguna',
+        ]);
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(
+            route('dashboard', absolute: false)
+        );
+    }
+
+    /**
+     * Handle login for internal users.
+     *
+     * Allowed roles:
+     * - CC Room
+     * - Manager Keuangan
+     * - Manager Operasional
+     */
+    public function storeInternal(LoginRequest $request): RedirectResponse
+    {
+        $request->authenticate([
+            'cc_room',
+            'manager_keuangan',
+            'manager_operasional',
+        ]);
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(
+            route('dashboard', absolute: false)
+        );
     }
 
     /**

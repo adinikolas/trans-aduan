@@ -38,15 +38,30 @@ class LoginRequest extends FormRequest
      *
      * @throws ValidationException
      */
-    public function authenticate(): void
+    public function authenticate(?array $allowedRoles = null): void
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (! Auth::attempt(
+            $this->only('email', 'password'),
+            $this->boolean('remember')
+        )) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
+            ]);
+        }
+
+        // Batasi role berdasarkan halaman login
+        if (
+            $allowedRoles !== null &&
+            ! in_array(Auth::user()->role, $allowedRoles, true)
+        ) {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun tidak memiliki akses ke halaman login ini.',
             ]);
         }
 
@@ -81,6 +96,8 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(
+            Str::lower($this->string('email')) . '|' . $this->ip()
+        );
     }
 }

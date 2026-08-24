@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
-    protected $fillable = ['name', 'division_id'];
+    use HasFactory;
 
-    // Relasi: Kategori ini secara otomatis masuk ke divisi mana
+    protected $fillable = [
+        'name',
+        'division_id',
+    ];
+
     public function division()
     {
         return $this->belongsTo(Division::class);

@@ -14,86 +14,123 @@ class DatabaseSeeder extends Seeder
     {
         /*
         |--------------------------------------------------------------------------
-        | 1. Membuat Divisi
+        | 1. DIVISI
         |--------------------------------------------------------------------------
-        |
-        | Untuk sementara struktur divisi tetap menggunakan satu divisi
-        | yang sudah ada pada rancangan aplikasi.
-        |
-        | Nama "Kepala Divisi" diubah menjadi "Operasional" karena
-        | role Kadiv sudah tidak digunakan.
-        |
         */
-        $divUtama = Division::create([
-            'name' => 'Operasional'
+
+        $operasional = Division::firstOrCreate([
+            'name' => 'Operasional',
         ]);
+
+        $keuangan = Division::firstOrCreate([
+            'name' => 'Keuangan',
+        ]);
+
 
         /*
         |--------------------------------------------------------------------------
-        | 2. Kategori Aduan
+        | 2. KATEGORI OPERASIONAL
         |--------------------------------------------------------------------------
         */
-        Category::create([
-            'name' => 'Perilaku Pengemudi',
-            'division_id' => $divUtama->id
-        ]);
 
-        Category::create([
-            'name' => 'Fasilitas Halte Rusak',
-            'division_id' => $divUtama->id
-        ]);
+        $operasionalCategories = [
+            'Perilaku Pengemudi',
+            'Fasilitas Halte Rusak',
+            'Kondisi Armada (AC Mati, dll)',
+        ];
 
-        Category::create([
-            'name' => 'Kondisi Armada (AC Mati, dll)',
-            'division_id' => $divUtama->id
-        ]);
+        foreach ($operasionalCategories as $categoryName) {
+            Category::firstOrCreate(
+                ['name' => $categoryName],
+                ['division_id' => $operasional->id]
+            );
+        }
+
 
         /*
         |--------------------------------------------------------------------------
-        | 3. Akun Pengguna Umum
+        | 3. KATEGORI KEUANGAN
         |--------------------------------------------------------------------------
         */
-        User::create([
-            'name' => 'Budi Penumpang',
-            'email' => 'budi@gmail.com',
-            'password' => Hash::make('password123'),
-            'role' => 'pengguna',
-        ]);
+
+        $keuanganCategories = [
+            'Masalah Tarif / Tiket',
+            'Masalah Pembayaran',
+            'Masalah Transaksi Cashless',
+            'Refund / Pengembalian Dana',
+        ];
+
+        foreach ($keuanganCategories as $categoryName) {
+            Category::firstOrCreate(
+                ['name' => $categoryName],
+                ['division_id' => $keuangan->id]
+            );
+        }
+
 
         /*
         |--------------------------------------------------------------------------
-        | 4. Akun CC Room
+        | 4. AKUN PENGGUNA UMUM
         |--------------------------------------------------------------------------
         */
-        User::create([
-            'name' => 'Admin CC Room',
-            'email' => 'cc@trans.com',
-            'password' => Hash::make('password123'),
-            'role' => 'cc_room',
-        ]);
+
+        User::firstOrCreate(
+            ['email' => 'budi@gmail.com'],
+            [
+                'name' => 'Budi Penumpang',
+                'password' => Hash::make('password123'),
+                'role' => 'pengguna',
+            ]
+        );
+
 
         /*
         |--------------------------------------------------------------------------
-        | 5. Akun Manager Keuangan
+        | 5. AKUN CC ROOM
         |--------------------------------------------------------------------------
         */
-        User::create([
-            'name' => 'Manager Keuangan',
-            'email' => 'manager.keuangan@trans.com',
-            'password' => Hash::make('password123'),
-            'role' => 'manager_keuangan',
-        ]);
+
+        User::firstOrCreate(
+            ['email' => 'cc@trans.com'],
+            [
+                'name' => 'Admin CC Room',
+                'password' => Hash::make('password123'),
+                'role' => 'cc_room',
+            ]
+        );
+
 
         /*
         |--------------------------------------------------------------------------
-        | 6. Akun Manager Operasional
+        | 6. AKUN MANAGER KEUANGAN
         |--------------------------------------------------------------------------
         */
-        User::create([
-            'name' => 'Manager Operasional',
-            'email' => 'manager.operasional@trans.com',
-            'password' => Hash::make('password123'),
-            'role' => 'manager_operasional',
-        ]);
+
+        User::firstOrCreate(
+            ['email' => 'manager.keuangan@trans.com'],
+            [
+                'name' => 'Manager Keuangan',
+                'password' => Hash::make('password123'),
+                'role' => 'manager_keuangan',
+                'division_id' => $keuangan->id,
+            ]
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | 7. AKUN MANAGER OPERASIONAL
+        |--------------------------------------------------------------------------
+        */
+
+        User::firstOrCreate(
+            ['email' => 'manager.operasional@trans.com'],
+            [
+                'name' => 'Manager Operasional',
+                'password' => Hash::make('password123'),
+                'role' => 'manager_operasional',
+                'division_id' => $operasional->id,
+            ]
+        );
     }
 }

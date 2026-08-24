@@ -45,6 +45,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/aduan', [ComplaintController::class, 'store'])
         ->name('complaints.store');
 
+    // Jenis Aduan Manager
+    Route::get('/manager/keuangan/jenis-aduan', [ComplaintController::class, 'jenisAduanManagerKeuangan'])
+        ->name('manager.keuangan.jenis');
+
+    Route::get('/manager/operasional/jenis-aduan', [ComplaintController::class, 'jenisAduanManagerOperasional'])
+        ->name('manager.operasional.jenis');
+
     // Detail & Update
     Route::get('/aduan/{id}', [ComplaintController::class, 'show'])
         ->name('complaints.show');

@@ -175,6 +175,330 @@ class ComplaintController extends Controller
         abort(403, 'Akses tidak diizinkan.');
     }
 
+    /**
+     * Dashboard Manager Keuangan
+     */
+    public function dashboardManagerKeuangan()
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'manager_keuangan') {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        $divisionId = $user->division_id;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Statistik utama
+        |--------------------------------------------------------------------------
+        */
+        $baseQuery = Complaint::where('division_id', $divisionId);
+
+        $totalAduan = (clone $baseQuery)->count();
+
+        $selesai = (clone $baseQuery)
+            ->where('status', 'selesai')
+            ->count();
+
+        $diproses = (clone $baseQuery)
+            ->where('status', 'diproses')
+            ->count();
+
+        $menungguValidasi = (clone $baseQuery)
+            ->where('status', 'menunggu_validasi_cc')
+            ->count();
+
+        $belumDitindaklanjuti = (clone $baseQuery)
+            ->whereIn('status', [
+                'menunggu',
+                'diproses',
+                'menunggu_validasi_cc'
+            ])
+            ->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Rekap berdasarkan kategori
+        |--------------------------------------------------------------------------
+        */
+        $categoryStats = Category::where('division_id', $divisionId)
+            ->withCount([
+                'complaints as total_complaints' => function ($query) use ($divisionId) {
+                    $query->where('division_id', $divisionId);
+                },
+
+                'complaints as diproses_count' => function ($query) use ($divisionId) {
+                    $query->where('division_id', $divisionId)
+                        ->where('status', 'diproses');
+                },
+
+                'complaints as validasi_count' => function ($query) use ($divisionId) {
+                    $query->where('division_id', $divisionId)
+                        ->where('status', 'menunggu_validasi_cc');
+                },
+
+                'complaints as selesai_count' => function ($query) use ($divisionId) {
+                    $query->where('division_id', $divisionId)
+                        ->where('status', 'selesai');
+                },
+            ])
+            ->orderByDesc('total_complaints')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Rekap aduan 6 bulan terakhir
+        |--------------------------------------------------------------------------
+        */
+        $startDate = now()
+            ->startOfMonth()
+            ->subMonths(5);
+
+        $monthlyData = Complaint::where('division_id', $divisionId)
+            ->where('created_at', '>=', $startDate)
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as bulan, COUNT(*) as total")
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Lengkapi bulan yang tidak memiliki aduan
+        |--------------------------------------------------------------------------
+        */
+        $monthlyStats = collect();
+
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->startOfMonth()->subMonths($i);
+
+            $key = $date->format('Y-m');
+
+            $data = $monthlyData->firstWhere('bulan', $key);
+
+            $monthlyStats->push([
+                'bulan' => $key,
+                'label' => $date->translatedFormat('F Y'),
+                'total' => $data ? $data->total : 0,
+            ]);
+        }
+
+        return view(
+            'manager.keuangan.dashboard',
+            compact(
+                'totalAduan',
+                'selesai',
+                'diproses',
+                'menungguValidasi',
+                'belumDitindaklanjuti',
+                'categoryStats',
+                'monthlyStats'
+            )
+        );
+    }
+
+    /**
+     * Dashboard Manager Operasional
+     */
+    public function dashboardManagerOperasional()
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'manager_operasional') {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        $divisionId = $user->division_id;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Statistik utama
+        |--------------------------------------------------------------------------
+        */
+        $baseQuery = Complaint::where('division_id', $divisionId);
+
+        $totalAduan = (clone $baseQuery)->count();
+
+        $selesai = (clone $baseQuery)
+            ->where('status', 'selesai')
+            ->count();
+
+        $diproses = (clone $baseQuery)
+            ->where('status', 'diproses')
+            ->count();
+
+        $menungguValidasi = (clone $baseQuery)
+            ->where('status', 'menunggu_validasi_cc')
+            ->count();
+
+        $belumDitindaklanjuti = (clone $baseQuery)
+            ->whereIn('status', [
+                'menunggu',
+                'diproses',
+                'menunggu_validasi_cc'
+            ])
+            ->count();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Rekap berdasarkan kategori
+        |--------------------------------------------------------------------------
+        */
+        $categoryStats = Category::where('division_id', $divisionId)
+            ->withCount([
+                'complaints as total_complaints' => function ($query) use ($divisionId) {
+                    $query->where('division_id', $divisionId);
+                },
+
+                'complaints as diproses_count' => function ($query) use ($divisionId) {
+                    $query->where('division_id', $divisionId)
+                        ->where('status', 'diproses');
+                },
+
+                'complaints as validasi_count' => function ($query) use ($divisionId) {
+                    $query->where('division_id', $divisionId)
+                        ->where('status', 'menunggu_validasi_cc');
+                },
+
+                'complaints as selesai_count' => function ($query) use ($divisionId) {
+                    $query->where('division_id', $divisionId)
+                        ->where('status', 'selesai');
+                },
+            ])
+            ->orderByDesc('total_complaints')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Rekap aduan 6 bulan terakhir
+        |--------------------------------------------------------------------------
+        */
+        $startDate = now()
+            ->startOfMonth()
+            ->subMonths(5);
+
+        $monthlyData = Complaint::where('division_id', $divisionId)
+            ->where('created_at', '>=', $startDate)
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as bulan, COUNT(*) as total")
+            ->groupBy('bulan')
+            ->orderBy('bulan')
+            ->get();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Lengkapi bulan yang tidak memiliki aduan
+        |--------------------------------------------------------------------------
+        */
+        $monthlyStats = collect();
+
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->startOfMonth()->subMonths($i);
+
+            $key = $date->format('Y-m');
+
+            $data = $monthlyData->firstWhere('bulan', $key);
+
+            $monthlyStats->push([
+                'bulan' => $key,
+                'label' => $date->translatedFormat('F Y'),
+                'total' => $data ? $data->total : 0,
+            ]);
+        }
+
+        return view(
+            'manager.operasional.dashboard',
+            compact(
+                'totalAduan',
+                'selesai',
+                'diproses',
+                'menungguValidasi',
+                'belumDitindaklanjuti',
+                'categoryStats',
+                'monthlyStats'
+            )
+        );
+    }
+
+    /**
+     * Daftar Aduan Manager Keuangan
+     */
+    public function aduanManagerKeuangan(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'manager_keuangan') {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        $complaints = Complaint::with([
+                'user',
+                'category',
+                'division'
+            ])
+            ->where('division_id', $user->division_id)
+            ->whereIn('status', [
+                'diproses',
+                'menunggu_validasi_cc'
+            ])
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('ticket_number', 'like', '%' . $search . '%')
+                        ->orWhere('title', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($request->status, function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view(
+            'manager.keuangan.aduan',
+            compact('complaints')
+        );
+    }
+
+
+    /**
+     * Daftar Aduan Manager Operasional
+     */
+    public function aduanManagerOperasional(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'manager_operasional') {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        $complaints = Complaint::with([
+                'user',
+                'category',
+                'division'
+            ])
+            ->where('division_id', $user->division_id)
+            ->whereIn('status', [
+                'diproses',
+                'menunggu_validasi_cc'
+            ])
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('ticket_number', 'like', '%' . $search . '%')
+                        ->orWhere('title', 'like', '%' . $search . '%');
+                });
+            })
+            ->when($request->status, function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view(
+            'manager.operasional.aduan',
+            compact('complaints')
+        );
+    }
 
     /**
      * Menampilkan formulir pembuatan aduan.

@@ -25,12 +25,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/aduan', [ComplaintController::class, 'index'])
         ->name('complaints.index');
 
-    // Dashboard Manager dipisahkan berdasarkan role
-    Route::get('/manager/keuangan', [ComplaintController::class, 'index'])
+    // Dashboard Manager
+    Route::get('/manager/keuangan', [ComplaintController::class, 'dashboardManagerKeuangan'])
         ->name('manager.keuangan');
 
-    Route::get('/manager/operasional', [ComplaintController::class, 'index'])
+    Route::get('/manager/operasional', [ComplaintController::class, 'dashboardManagerOperasional'])
         ->name('manager.operasional');
+
+    // Daftar Aduan Manager
+    Route::get('/manager/keuangan/aduan', [ComplaintController::class, 'aduanManagerKeuangan'])
+        ->name('manager.keuangan.aduan');
+
+    Route::get('/manager/operasional/aduan', [ComplaintController::class, 'aduanManagerOperasional'])
+        ->name('manager.operasional.aduan');
 
     Route::get('/aduan/buat', [ComplaintController::class, 'create'])
         ->name('complaints.create');

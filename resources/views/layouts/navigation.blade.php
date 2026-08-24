@@ -48,7 +48,14 @@
                             :href="route('manager.keuangan')"
                             :active="request()->routeIs('manager.keuangan')"
                         >
-                            {{ __('Dashboard Keuangan') }}
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+
+                        <x-nav-link
+                            :href="route('manager.keuangan.aduan')"
+                            :active="request()->routeIs('manager.keuangan.aduan')"
+                        >
+                            {{ __('Daftar Aduan') }}
                         </x-nav-link>
 
                     @elseif(Auth::user()->role === 'manager_operasional')
@@ -57,7 +64,14 @@
                             :href="route('manager.operasional')"
                             :active="request()->routeIs('manager.operasional')"
                         >
-                            {{ __('Dashboard Operasional') }}
+                            {{ __('Dashboard') }}
+                        </x-nav-link>
+
+                        <x-nav-link
+                            :href="route('manager.operasional.aduan')"
+                            :active="request()->routeIs('manager.operasional.aduan')"
+                        >
+                            {{ __('Daftar Aduan') }}
                         </x-nav-link>
 
                     @endif
@@ -247,7 +261,14 @@
                     :href="route('manager.keuangan')"
                     :active="request()->routeIs('manager.keuangan')"
                 >
-                    {{ __('Dashboard Keuangan') }}
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link
+                    :href="route('manager.keuangan.aduan')"
+                    :active="request()->routeIs('manager.keuangan.aduan')"
+                >
+                    {{ __('Daftar Aduan') }}
                 </x-responsive-nav-link>
 
             @elseif(Auth::user()->role === 'manager_operasional')
@@ -256,7 +277,14 @@
                     :href="route('manager.operasional')"
                     :active="request()->routeIs('manager.operasional')"
                 >
-                    {{ __('Dashboard Operasional') }}
+                    {{ __('Dashboard') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link
+                    :href="route('manager.operasional.aduan')"
+                    :active="request()->routeIs('manager.operasional.aduan')"
+                >
+                    {{ __('Daftar Aduan') }}
                 </x-responsive-nav-link>
 
             @endif

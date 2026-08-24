@@ -108,21 +108,12 @@ class ComplaintController extends Controller
         |--------------------------------------------------------------------------
         */
         if ($user->role === 'manager_keuangan') {
-
-            $keuangan = Division::where(
-                'name',
-                'Keuangan'
-            )->firstOrFail();
-
             $complaints = Complaint::with([
                     'user',
                     'category',
                     'division'
                 ])
-                ->where(
-                    'division_id',
-                    $keuangan->id
-                )
+                ->where('division_id', $user->division_id)
                 ->whereIn(
                     'status',
                     ['diproses', 'menunggu_validasi_cc']
@@ -152,21 +143,12 @@ class ComplaintController extends Controller
         |--------------------------------------------------------------------------
         */
         if ($user->role === 'manager_operasional') {
-
-            $operasional = Division::where(
-                'name',
-                'Operasional'
-            )->firstOrFail();
-
             $complaints = Complaint::with([
                     'user',
                     'category',
                     'division'
                 ])
-                ->where(
-                    'division_id',
-                    $operasional->id
-                )
+                ->where('division_id', $user->division_id)
                 ->whereIn(
                     'status',
                     ['diproses', 'menunggu_validasi_cc']
@@ -307,87 +289,81 @@ class ComplaintController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Pengguna hanya boleh melihat aduannya sendiri
+        | PENGGUNA UMUM
+        |--------------------------------------------------------------------------
+        | Pengguna hanya boleh melihat aduan miliknya sendiri.
         |--------------------------------------------------------------------------
         */
-        if (
-            $user->role === 'pengguna' &&
-            $complaint->user_id !== $user->id
-        ) {
-            abort(
-                403,
-                'Anda tidak memiliki hak akses untuk melihat laporan ini.'
-            );
-        }
+        if ($user->role === 'pengguna') {
 
-        /*
-        |--------------------------------------------------------------------------
-        | CC Room boleh melihat semua aduan
-        |--------------------------------------------------------------------------
-        */
-        if ($user->role === 'cc_room') {
-
-            $divisions = Division::all();
-
-            return view(
-                'complaints.show',
-                compact(
-                    'complaint',
-                    'divisions'
-                )
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Manager hanya boleh melihat aduan divisinya
-        |--------------------------------------------------------------------------
-        */
-        if (
-            in_array(
-                $user->role,
-                [
-                    'manager_keuangan',
-                    'manager_operasional'
-                ],
-                true
-            )
-        ) {
-
-            $divisionName =
-                $user->role === 'manager_keuangan'
-                    ? 'Keuangan'
-                    : 'Operasional';
-
-            $division = Division::where(
-                'name',
-                $divisionName
-            )->firstOrFail();
-
-            if (
-                $complaint->division_id !==
-                $division->id
-            ) {
+            if ($complaint->user_id !== $user->id) {
                 abort(
                     403,
-                    'Anda tidak memiliki akses ke laporan divisi lain.'
+                    'Anda tidak memiliki hak akses untuk melihat laporan ini.'
                 );
             }
+        }
 
-            return view(
-                'complaints.show',
-                compact(
-                    'complaint'
-                )
+
+        /*
+        |--------------------------------------------------------------------------
+        | MANAGER KEUANGAN & OPERASIONAL
+        |--------------------------------------------------------------------------
+        | Manager hanya boleh melihat aduan yang menjadi tanggung jawab
+        | divisinya.
+        |--------------------------------------------------------------------------
+        */
+        if (in_array($user->role, [
+            'manager_keuangan',
+            'manager_operasional',
+        ], true)) {
+
+            if ($complaint->division_id !== $user->division_id) {
+                abort(
+                    403,
+                    'Anda tidak memiliki hak akses ke laporan divisi lain.'
+                );
+            }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROLE INTERNAL YANG DIIZINKAN
+        |--------------------------------------------------------------------------
+        */
+
+        $allowedRoles = [
+            'cc_room',
+            'manager_keuangan',
+            'manager_operasional',
+            'pengguna',
+        ];
+
+        if (!in_array($user->role, $allowedRoles, true)) {
+            abort(
+                403,
+                'Anda tidak memiliki akses ke laporan ini.'
             );
         }
 
-        abort(
-            403,
-            'Anda tidak memiliki akses ke laporan ini.'
+
+        /*
+        |--------------------------------------------------------------------------
+        | DAFTAR DIVISI
+        |--------------------------------------------------------------------------
+        */
+
+        $divisions = \App\Models\Division::all();
+
+        return view(
+            'complaints.show',
+            compact(
+                'complaint',
+                'divisions'
+            )
         );
     }
-
 
     /**
      * Update status oleh CC Room.

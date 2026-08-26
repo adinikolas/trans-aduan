@@ -2,36 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Complaint;
 use App\Models\Category;
+use App\Models\Complaint;
 use App\Models\ComplaintHistory;
+use App\Models\Feedback;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ComplaintController extends Controller
 {
-    /**
-     * Menampilkan halaman sesuai role user.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD / DAFTAR ADUAN
+    |--------------------------------------------------------------------------
+    */
+
     public function index(Request $request)
     {
         $user = Auth::user();
 
         /*
         |--------------------------------------------------------------------------
-        | 1. PENGGUNA UMUM
+        | PENGGUNA UMUM
         |--------------------------------------------------------------------------
         */
         if ($user->role === 'pengguna') {
-            $complaints = Complaint::with([
-                    'category',
-                    'division'
+            $baseQuery = Complaint::where('user_id', $user->id);
+
+            $totalAduan = (clone $baseQuery)->count();
+
+            $menunggu = (clone $baseQuery)
+                ->where('status', 'menunggu')
+                ->count();
+
+            $diproses = (clone $baseQuery)
+                ->whereIn('status', [
+                    'diproses',
+                    'menunggu_validasi_cc',
                 ])
-                ->where('user_id', $user->id)
+                ->count();
+
+            $selesai = (clone $baseQuery)
+                ->where('status', 'selesai')
+                ->count();
+
+            $ditolak = (clone $baseQuery)
+                ->where('status', 'ditolak')
+                ->count();
+
+            $complaints = (clone $baseQuery)
+                ->with([
+                    'category',
+                    'division',
+                    'feedback',
+                ])
                 ->when($request->search, function ($query, $search) {
                     $query->where(function ($q) use ($search) {
-                        $q->where('ticket_number', 'like', '%' . $search . '%')
-                            ->orWhere('title', 'like', '%' . $search . '%');
+                        $q->where(
+                            'ticket_number',
+                            'like',
+                            "%{$search}%"
+                        )->orWhere(
+                            'title',
+                            'like',
+                            "%{$search}%"
+                        );
                     });
                 })
                 ->when($request->status, function ($query, $status) {
@@ -43,17 +78,23 @@ class ComplaintController extends Controller
 
             return view(
                 'complaints.index_pengguna',
-                compact('complaints')
+                compact(
+                    'complaints',
+                    'totalAduan',
+                    'menunggu',
+                    'diproses',
+                    'selesai',
+                    'ditolak'
+                )
             );
         }
 
         /*
         |--------------------------------------------------------------------------
-        | 2. CC ROOM
+        | CC ROOM
         |--------------------------------------------------------------------------
         */
         if ($user->role === 'cc_room') {
-
             $totalAduan = Complaint::count();
 
             $menunggu = Complaint::where(
@@ -63,7 +104,10 @@ class ComplaintController extends Controller
 
             $diproses = Complaint::whereIn(
                 'status',
-                ['diproses', 'menunggu_validasi_cc']
+                [
+                    'diproses',
+                    'menunggu_validasi_cc',
+                ]
             )->count();
 
             $selesai = Complaint::where(
@@ -72,14 +116,21 @@ class ComplaintController extends Controller
             )->count();
 
             $complaints = Complaint::with([
-                    'user',
-                    'category',
-                    'division'
-                ])
+                'user',
+                'category',
+                'division',
+            ])
                 ->when($request->search, function ($query, $search) {
                     $query->where(function ($q) use ($search) {
-                        $q->where('ticket_number', 'like', '%' . $search . '%')
-                            ->orWhere('title', 'like', '%' . $search . '%');
+                        $q->where(
+                            'ticket_number',
+                            'like',
+                            "%{$search}%"
+                        )->orWhere(
+                            'title',
+                            'like',
+                            "%{$search}%"
+                        );
                     });
                 })
                 ->when($request->status, function ($query, $status) {
@@ -103,25 +154,37 @@ class ComplaintController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 3. MANAGER KEUANGAN
+        | MANAGER KEUANGAN
         |--------------------------------------------------------------------------
         */
         if ($user->role === 'manager_keuangan') {
-
             $complaints = Complaint::with([
-                    'user',
-                    'category',
-                    'division'
-                ])
-                ->where('division_id', $user->division_id)
+                'user',
+                'category',
+                'division',
+            ])
+                ->where(
+                    'division_id',
+                    $user->division_id
+                )
                 ->whereIn(
                     'status',
-                    ['diproses', 'menunggu_validasi_cc']
+                    [
+                        'diproses',
+                        'menunggu_validasi_cc',
+                    ]
                 )
                 ->when($request->search, function ($query, $search) {
                     $query->where(function ($q) use ($search) {
-                        $q->where('ticket_number', 'like', '%' . $search . '%')
-                            ->orWhere('title', 'like', '%' . $search . '%');
+                        $q->where(
+                            'ticket_number',
+                            'like',
+                            "%{$search}%"
+                        )->orWhere(
+                            'title',
+                            'like',
+                            "%{$search}%"
+                        );
                     });
                 })
                 ->when($request->status, function ($query, $status) {
@@ -139,25 +202,37 @@ class ComplaintController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | 4. MANAGER OPERASIONAL
+        | MANAGER OPERASIONAL
         |--------------------------------------------------------------------------
         */
         if ($user->role === 'manager_operasional') {
-
             $complaints = Complaint::with([
-                    'user',
-                    'category',
-                    'division'
-                ])
-                ->where('division_id', $user->division_id)
+                'user',
+                'category',
+                'division',
+            ])
+                ->where(
+                    'division_id',
+                    $user->division_id
+                )
                 ->whereIn(
                     'status',
-                    ['diproses', 'menunggu_validasi_cc']
+                    [
+                        'diproses',
+                        'menunggu_validasi_cc',
+                    ]
                 )
                 ->when($request->search, function ($query, $search) {
                     $query->where(function ($q) use ($search) {
-                        $q->where('ticket_number', 'like', '%' . $search . '%')
-                            ->orWhere('title', 'like', '%' . $search . '%');
+                        $q->where(
+                            'ticket_number',
+                            'like',
+                            "%{$search}%"
+                        )->orWhere(
+                            'title',
+                            'like',
+                            "%{$search}%"
+                        );
                     });
                 })
                 ->when($request->status, function ($query, $status) {
@@ -176,196 +251,235 @@ class ComplaintController extends Controller
         abort(403, 'Akses tidak diizinkan.');
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD PENGGUNA
+    |--------------------------------------------------------------------------
+    */
+
+    private function indexPengguna(Request $request, $user)
+    {
+        $baseQuery = Complaint::where('user_id', $user->id);
+
+        $totalAduan = (clone $baseQuery)->count();
+
+        $menunggu = (clone $baseQuery)
+            ->where('status', 'menunggu')
+            ->count();
+
+        $diproses = (clone $baseQuery)
+            ->whereIn('status', [
+                'diproses',
+                'menunggu_validasi_cc',
+            ])
+            ->count();
+
+        $selesai = (clone $baseQuery)
+            ->where('status', 'selesai')
+            ->count();
+
+        $complaints = (clone $baseQuery)
+            ->with([
+                'category',
+                'division',
+                'feedback',
+            ])
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where(
+                        'ticket_number',
+                        'like',
+                        "%{$search}%"
+                    )->orWhere(
+                        'title',
+                        'like',
+                        "%{$search}%"
+                    );
+                });
+            })
+            ->when($request->status, function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view(
+            'complaints.index_pengguna',
+            compact(
+                'complaints',
+                'totalAduan',
+                'menunggu',
+                'diproses',
+                'selesai'
+            )
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DASHBOARD CC ROOM
+    |--------------------------------------------------------------------------
+    */
+
+    private function indexCC(Request $request)
+    {
+        $totalAduan = Complaint::count();
+
+        $menunggu = Complaint::where(
+            'status',
+            'menunggu'
+        )->count();
+
+        $diproses = Complaint::whereIn(
+            'status',
+            [
+                'diproses',
+                'menunggu_validasi_cc',
+            ]
+        )->count();
+
+        $selesai = Complaint::where(
+            'status',
+            'selesai'
+        )->count();
+
+        $complaints = Complaint::with([
+            'user',
+            'category',
+            'division',
+        ])
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where(
+                        'ticket_number',
+                        'like',
+                        "%{$search}%"
+                    )->orWhere(
+                        'title',
+                        'like',
+                        "%{$search}%"
+                    );
+                });
+            })
+            ->when($request->status, function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view(
+            'complaints.index_cc',
+            compact(
+                'complaints',
+                'totalAduan',
+                'menunggu',
+                'diproses',
+                'selesai'
+            )
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DAFTAR ADUAN MANAGER
+    |--------------------------------------------------------------------------
+    */
+
+    private function indexManager(
+        Request $request,
+        $user,
+        string $manager
+    ) {
+        $complaints = Complaint::with([
+            'user',
+            'category',
+            'division',
+        ])
+            ->where(
+                'division_id',
+                $user->division_id
+            )
+            ->whereIn(
+                'status',
+                [
+                    'diproses',
+                    'menunggu_validasi_cc',
+                ]
+            )
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where(
+                        'ticket_number',
+                        'like',
+                        "%{$search}%"
+                    )->orWhere(
+                        'title',
+                        'like',
+                        "%{$search}%"
+                    );
+                });
+            })
+            ->when($request->status, function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view(
+            "complaints.index_manager_{$manager}",
+            compact('complaints')
+        );
+    }
 
     /*
     |--------------------------------------------------------------------------
     | DASHBOARD MANAGER KEUANGAN
     |--------------------------------------------------------------------------
     */
+
     public function dashboardManagerKeuangan()
     {
-        $user = Auth::user();
-
-        if ($user->role !== 'manager_keuangan') {
-            abort(403, 'Akses tidak diizinkan.');
-        }
-
-        $divisionId = $user->division_id;
-
-        /*
-        |--------------------------------------------------------------------------
-        | Statistik utama
-        |--------------------------------------------------------------------------
-        */
-        $baseQuery = Complaint::where(
-            'division_id',
-            $divisionId
-        );
-
-        $totalAduan = (clone $baseQuery)->count();
-
-        $selesai = (clone $baseQuery)
-            ->where('status', 'selesai')
-            ->count();
-
-        $diproses = (clone $baseQuery)
-            ->where('status', 'diproses')
-            ->count();
-
-        $menungguValidasi = (clone $baseQuery)
-            ->where(
-                'status',
-                'menunggu_validasi_cc'
-            )
-            ->count();
-
-        $belumDitindaklanjuti = (clone $baseQuery)
-            ->whereIn('status', [
-                'menunggu',
-                'diproses',
-                'menunggu_validasi_cc'
-            ])
-            ->count();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Rekap berdasarkan kategori
-        |--------------------------------------------------------------------------
-        */
-        $categoryStats = Category::where(
-            'division_id',
-            $divisionId
-        )
-            ->withCount([
-
-                'complaints as total_complaints' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    );
-                },
-
-                'complaints as diproses_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'diproses'
-                    );
-                },
-
-                'complaints as validasi_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'menunggu_validasi_cc'
-                    );
-                },
-
-                'complaints as selesai_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'selesai'
-                    );
-                },
-
-            ])
-            ->orderByDesc('total_complaints')
-            ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Rekap 6 bulan terakhir
-        |--------------------------------------------------------------------------
-        */
-        $startDate = now()
-            ->startOfMonth()
-            ->subMonths(5);
-
-        $monthlyData = Complaint::where(
-            'division_id',
-            $divisionId
-        )
-            ->where(
-                'created_at',
-                '>=',
-                $startDate
-            )
-            ->selectRaw(
-                "DATE_FORMAT(created_at, '%Y-%m') as bulan, COUNT(*) as total"
-            )
-            ->groupBy('bulan')
-            ->orderBy('bulan')
-            ->get();
-
-        $monthlyStats = collect();
-
-        for ($i = 5; $i >= 0; $i--) {
-
-            $date = now()
-                ->startOfMonth()
-                ->subMonths($i);
-
-            $key = $date->format('Y-m');
-
-            $data = $monthlyData->firstWhere(
-                'bulan',
-                $key
-            );
-
-            $monthlyStats->push([
-                'bulan' => $key,
-                'label' => $date->translatedFormat('F Y'),
-                'total' => $data
-                    ? $data->total
-                    : 0,
-            ]);
-        }
-
-        return view(
-            'manager.keuangan.dashboard',
-            compact(
-                'totalAduan',
-                'selesai',
-                'diproses',
-                'menungguValidasi',
-                'belumDitindaklanjuti',
-                'categoryStats',
-                'monthlyStats'
-            )
+        return $this->managerDashboard(
+            'manager_keuangan',
+            'manager.keuangan.dashboard'
         );
     }
-
 
     /*
     |--------------------------------------------------------------------------
     | DASHBOARD MANAGER OPERASIONAL
     |--------------------------------------------------------------------------
     */
+
     public function dashboardManagerOperasional()
     {
+        return $this->managerDashboard(
+            'manager_operasional',
+            'manager.operasional.dashboard'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DATA DASHBOARD MANAGER
+    |--------------------------------------------------------------------------
+    */
+
+    private function managerDashboard(
+        string $role,
+        string $view
+    ) {
         $user = Auth::user();
 
-        if ($user->role !== 'manager_operasional') {
+        if ($user->role !== $role) {
             abort(403, 'Akses tidak diizinkan.');
         }
 
         $divisionId = $user->division_id;
 
-        /*
-        |--------------------------------------------------------------------------
-        | Statistik utama
-        |--------------------------------------------------------------------------
-        */
         $baseQuery = Complaint::where(
             'division_id',
             $divisionId
@@ -389,73 +503,128 @@ class ComplaintController extends Controller
             ->count();
 
         $belumDitindaklanjuti = (clone $baseQuery)
-            ->whereIn('status', [
-                'menunggu',
-                'diproses',
-                'menunggu_validasi_cc'
-            ])
+            ->whereIn(
+                'status',
+                [
+                    'menunggu',
+                    'diproses',
+                    'menunggu_validasi_cc',
+                ]
+            )
             ->count();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Rekap berdasarkan kategori
-        |--------------------------------------------------------------------------
-        */
-        $categoryStats = Category::where(
+        $categoryStats = $this->getCategoryStats(
+            $divisionId,
+            true
+        );
+
+        $monthlyStats = $this->getMonthlyStats(
+            $divisionId
+        );
+
+        return view(
+            $view,
+            compact(
+                'totalAduan',
+                'selesai',
+                'diproses',
+                'menungguValidasi',
+                'belumDitindaklanjuti',
+                'categoryStats',
+                'monthlyStats'
+            )
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | STATISTIK KATEGORI
+    |--------------------------------------------------------------------------
+    */
+
+    private function getCategoryStats(
+        int $divisionId,
+        bool $includeMenunggu = false
+    ) {
+        $counts = [
+            'complaints as total_complaints' => function ($query) use ($divisionId) {
+                $query->where(
+                    'division_id',
+                    $divisionId
+                );
+            },
+
+            'complaints as diproses_count' => function ($query) use ($divisionId) {
+                $query->where(
+                    'division_id',
+                    $divisionId
+                )->where(
+                    'status',
+                    'diproses'
+                );
+            },
+
+            'complaints as validasi_count' => function ($query) use ($divisionId) {
+                $query->where(
+                    'division_id',
+                    $divisionId
+                )->where(
+                    'status',
+                    'menunggu_validasi_cc'
+                );
+            },
+
+            'complaints as selesai_count' => function ($query) use ($divisionId) {
+                $query->where(
+                    'division_id',
+                    $divisionId
+                )->where(
+                    'status',
+                    'selesai'
+                );
+            },
+
+            'complaints as ditolak_count' => function ($query) use ($divisionId) {
+                $query->where(
+                    'division_id',
+                    $divisionId
+                )->where(
+                    'status',
+                    'ditolak'
+                );
+            },
+        ];
+
+        if ($includeMenunggu) {
+            $counts['complaints as menunggu_count'] =
+                function ($query) use ($divisionId) {
+                    $query->where(
+                        'division_id',
+                        $divisionId
+                    )->where(
+                        'status',
+                        'menunggu'
+                    );
+                };
+        }
+
+        return Category::where(
             'division_id',
             $divisionId
         )
-            ->withCount([
-
-                'complaints as total_complaints' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    );
-                },
-
-                'complaints as diproses_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'diproses'
-                    );
-                },
-
-                'complaints as validasi_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'menunggu_validasi_cc'
-                    );
-                },
-
-                'complaints as selesai_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'selesai'
-                    );
-                },
-
-            ])
+            ->withCount($counts)
             ->orderByDesc('total_complaints')
             ->get();
+    }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Rekap 6 bulan terakhir
-        |--------------------------------------------------------------------------
-        */
+    /*
+    |--------------------------------------------------------------------------
+    | STATISTIK 6 BULAN
+    |--------------------------------------------------------------------------
+    */
+
+    private function getMonthlyStats(int $divisionId)
+    {
         $startDate = now()
             ->startOfMonth()
             ->subMonths(5);
@@ -476,123 +645,82 @@ class ComplaintController extends Controller
             ->orderBy('bulan')
             ->get();
 
-        $monthlyStats = collect();
+        return collect(range(5, 0))
+            ->reverse()
+            ->map(function ($i) use ($monthlyData) {
+                $date = now()
+                    ->startOfMonth()
+                    ->subMonths($i);
 
-        for ($i = 5; $i >= 0; $i--) {
+                $key = $date->format('Y-m');
 
-            $date = now()
-                ->startOfMonth()
-                ->subMonths($i);
+                $data = $monthlyData->firstWhere(
+                    'bulan',
+                    $key
+                );
 
-            $key = $date->format('Y-m');
-
-            $data = $monthlyData->firstWhere(
-                'bulan',
-                $key
-            );
-
-            $monthlyStats->push([
-                'bulan' => $key,
-                'label' => $date->translatedFormat('F Y'),
-                'total' => $data
-                    ? $data->total
-                    : 0,
-            ]);
-        }
-
-        return view(
-            'manager.operasional.dashboard',
-            compact(
-                'totalAduan',
-                'selesai',
-                'diproses',
-                'menungguValidasi',
-                'belumDitindaklanjuti',
-                'categoryStats',
-                'monthlyStats'
-            )
-        );
+                return [
+                    'bulan' => $key,
+                    'label' => $date->translatedFormat('F Y'),
+                    'total' => $data
+                        ? $data->total
+                        : 0,
+                ];
+            });
     }
-
 
     /*
     |--------------------------------------------------------------------------
     | DAFTAR ADUAN MANAGER KEUANGAN
     |--------------------------------------------------------------------------
     */
+
     public function aduanManagerKeuangan(Request $request)
     {
-        $user = Auth::user();
-
-        if ($user->role !== 'manager_keuangan') {
-            abort(403, 'Akses tidak diizinkan.');
-        }
-
-        $complaints = Complaint::with([
-                'user',
-                'category',
-                'division'
-            ])
-            ->where(
-                'division_id',
-                $user->division_id
-            )
-            ->whereIn(
-                'status',
-                [
-                    'diproses',
-                    'menunggu_validasi_cc'
-                ]
-            )
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where(
-                        'ticket_number',
-                        'like',
-                        '%' . $search . '%'
-                    )
-                    ->orWhere(
-                        'title',
-                        'like',
-                        '%' . $search . '%'
-                    );
-                });
-            })
-            ->when($request->status, function ($query, $status) {
-                $query->where(
-                    'status',
-                    $status
-                );
-            })
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
-        return view(
-            'manager.keuangan.aduan',
-            compact('complaints')
+        return $this->managerComplaints(
+            $request,
+            'manager_keuangan',
+            'manager.keuangan.aduan'
         );
     }
-
 
     /*
     |--------------------------------------------------------------------------
     | DAFTAR ADUAN MANAGER OPERASIONAL
     |--------------------------------------------------------------------------
     */
+
     public function aduanManagerOperasional(Request $request)
     {
+        return $this->managerComplaints(
+            $request,
+            'manager_operasional',
+            'manager.operasional.aduan'
+        );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | DAFTAR ADUAN MANAGER
+    |--------------------------------------------------------------------------
+    */
+
+    private function managerComplaints(
+        Request $request,
+        string $role,
+        string $view
+    ) {
         $user = Auth::user();
 
-        if ($user->role !== 'manager_operasional') {
+        if ($user->role !== $role) {
             abort(403, 'Akses tidak diizinkan.');
         }
 
         $complaints = Complaint::with([
-                'user',
-                'category',
-                'division'
-            ])
+            'user',
+            'category',
+            'division',
+        ])
             ->where(
                 'division_id',
                 $user->division_id
@@ -601,7 +729,7 @@ class ComplaintController extends Controller
                 'status',
                 [
                     'diproses',
-                    'menunggu_validasi_cc'
+                    'menunggu_validasi_cc',
                 ]
             )
             ->when($request->search, function ($query, $search) {
@@ -609,12 +737,11 @@ class ComplaintController extends Controller
                     $q->where(
                         'ticket_number',
                         'like',
-                        '%' . $search . '%'
-                    )
-                    ->orWhere(
+                        "%{$search}%"
+                    )->orWhere(
                         'title',
                         'like',
-                        '%' . $search . '%'
+                        "%{$search}%"
                     );
                 });
             })
@@ -629,205 +756,72 @@ class ComplaintController extends Controller
             ->withQueryString();
 
         return view(
-            'manager.operasional.aduan',
+            $view,
             compact('complaints')
         );
     }
-
 
     /*
     |--------------------------------------------------------------------------
     | JENIS ADUAN MANAGER KEUANGAN
     |--------------------------------------------------------------------------
     */
+
     public function jenisAduanManagerKeuangan()
     {
-        $user = Auth::user();
-
-        if ($user->role !== 'manager_keuangan') {
-            abort(403, 'Akses tidak diizinkan.');
-        }
-
-        $divisionId = $user->division_id;
-
-        $categoryStats = Category::where(
-            'division_id',
-            $divisionId
-        )
-            ->withCount([
-
-                'complaints as total_complaints' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    );
-                },
-
-                'complaints as menunggu_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'menunggu'
-                    );
-                },
-
-                'complaints as diproses_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'diproses'
-                    );
-                },
-
-                'complaints as validasi_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'menunggu_validasi_cc'
-                    );
-                },
-
-                'complaints as selesai_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'selesai'
-                    );
-                },
-
-                'complaints as ditolak_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'ditolak'
-                    );
-                },
-
-            ])
-            ->orderByDesc('total_complaints')
-            ->get();
-
-        return view(
-            'manager.keuangan.jenis_aduan',
-            compact('categoryStats')
+        return $this->jenisAduanManager(
+            'manager_keuangan',
+            'manager.keuangan.jenis_aduan'
         );
     }
-
 
     /*
     |--------------------------------------------------------------------------
     | JENIS ADUAN MANAGER OPERASIONAL
     |--------------------------------------------------------------------------
     */
+
     public function jenisAduanManagerOperasional()
     {
-        $user = Auth::user();
-
-        if ($user->role !== 'manager_operasional') {
-            abort(403, 'Akses tidak diizinkan.');
-        }
-
-        $divisionId = $user->division_id;
-
-        $categoryStats = Category::where(
-            'division_id',
-            $divisionId
-        )
-            ->withCount([
-
-                'complaints as total_complaints' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    );
-                },
-
-                'complaints as menunggu_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'menunggu'
-                    );
-                },
-
-                'complaints as diproses_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'diproses'
-                    );
-                },
-
-                'complaints as validasi_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'menunggu_validasi_cc'
-                    );
-                },
-
-                'complaints as selesai_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'selesai'
-                    );
-                },
-
-                'complaints as ditolak_count' => function ($query) use ($divisionId) {
-                    $query->where(
-                        'division_id',
-                        $divisionId
-                    )
-                    ->where(
-                        'status',
-                        'ditolak'
-                    );
-                },
-
-            ])
-            ->orderByDesc('total_complaints')
-            ->get();
-
-        return view(
-            'manager.operasional.jenis_aduan',
-            compact('categoryStats')
+        return $this->jenisAduanManager(
+            'manager_operasional',
+            'manager.operasional.jenis_aduan'
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | DATA JENIS ADUAN MANAGER
+    |--------------------------------------------------------------------------
+    */
+
+    private function jenisAduanManager(
+        string $role,
+        string $view
+    ) {
+        $user = Auth::user();
+
+        if ($user->role !== $role) {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        $categoryStats = $this->getCategoryStats(
+            $user->division_id,
+            true
+        );
+
+        return view(
+            $view,
+            compact('categoryStats')
+        );
+    }
 
     /*
     |--------------------------------------------------------------------------
     | FORM BUAT ADUAN
     |--------------------------------------------------------------------------
     */
+
     public function create()
     {
         if (Auth::user()->role !== 'pengguna') {
@@ -848,12 +842,12 @@ class ComplaintController extends Controller
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
-    | SIMPAN ADUAN BARU
+    | SIMPAN ADUAN
     |--------------------------------------------------------------------------
     */
+
     public function store(Request $request)
     {
         if (Auth::user()->role !== 'pengguna') {
@@ -863,49 +857,26 @@ class ComplaintController extends Controller
             );
         }
 
-        $validatedData = $request->validate([
-            'title' =>
-                'required|string|max:255',
-
-            'category_id' =>
-                'required|exists:categories,id',
-
-            'incident_time' =>
-                'required|date',
-
-            'bus_number' =>
-                'nullable|string|max:50',
-
-            'description' =>
-                'required|string',
-
-            'evidence' =>
-                'nullable|image|mimes:jpeg,png,jpg|max:2048',
-
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'incident_time' => 'required|date',
+            'bus_number' => 'nullable|string|max:50',
+            'description' => 'required|string',
+            'evidence' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ], [
-
-            'evidence.image' =>
-                'File bukti harus berupa gambar.',
-
-            'evidence.max' =>
-                'Ukuran foto maksimal adalah 2MB.',
-
+            'evidence.image' => 'File bukti harus berupa gambar.',
+            'evidence.max' => 'Ukuran foto maksimal adalah 2MB.',
         ]);
 
-        $evidencePath = null;
+        $evidencePath = $request->hasFile('evidence')
+            ? $request->file('evidence')->store(
+                'evidence_files',
+                'public'
+            )
+            : null;
 
-        if ($request->hasFile('evidence')) {
-
-            $evidencePath = $request
-                ->file('evidence')
-                ->store(
-                    'evidence_files',
-                    'public'
-                );
-        }
-
-        $ticketNumber =
-            'TKT-' .
+        $ticketNumber = 'TKT-' .
             date('Ymd') .
             '-' .
             str_pad(
@@ -916,107 +887,69 @@ class ComplaintController extends Controller
             );
 
         Complaint::create([
-            'ticket_number' =>
-                $ticketNumber,
-
-            'user_id' =>
-                Auth::id(),
-
-            'category_id' =>
-                $validatedData['category_id'],
-
-            'title' =>
-                $validatedData['title'],
-
-            'description' =>
-                $validatedData['description'],
-
-            'incident_time' =>
-                $validatedData['incident_time'],
-
-            'bus_number' =>
-                $validatedData['bus_number'] ?? null,
-
-            'evidence_path' =>
-                $evidencePath,
-
-            'status' =>
-                'menunggu',
-
-            'division_id' =>
-                null,
+            'ticket_number' => $ticketNumber,
+            'user_id' => Auth::id(),
+            'category_id' => $validated['category_id'],
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'incident_time' => $validated['incident_time'],
+            'bus_number' => $validated['bus_number'] ?? null,
+            'evidence_path' => $evidencePath,
+            'status' => 'menunggu',
+            'division_id' => null,
         ]);
 
         return redirect()
             ->route('complaints.index')
             ->with(
                 'success',
-                'Laporan aduan berhasil dikirim dengan Nomor Tiket: ' .
-                $ticketNumber
+                "Laporan berhasil dikirim dengan Nomor Tiket: {$ticketNumber}"
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
     | DETAIL ADUAN
     |--------------------------------------------------------------------------
     */
+
     public function show($id)
     {
         $complaint = Complaint::with([
             'user',
             'category',
-            'division'
+            'division',
         ])->findOrFail($id);
 
         $user = Auth::user();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Pengguna umum hanya boleh melihat aduannya sendiri
-        |--------------------------------------------------------------------------
-        */
-        if ($user->role === 'pengguna') {
-
-            if ($complaint->user_id !== $user->id) {
-                abort(
-                    403,
-                    'Anda tidak memiliki hak akses untuk melihat laporan ini.'
-                );
-            }
+        if (
+            $user->role === 'pengguna' &&
+            $complaint->user_id !== $user->id
+        ) {
+            abort(
+                403,
+                'Anda tidak memiliki hak akses untuk melihat laporan ini.'
+            );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Manager hanya boleh melihat aduan divisinya
-        |--------------------------------------------------------------------------
-        */
-        if (in_array(
-            $user->role,
-            [
-                'manager_keuangan',
-                'manager_operasional'
-            ],
-            true
-        )) {
-
-            if (
-                $complaint->division_id !==
-                $user->division_id
-            ) {
-                abort(
-                    403,
-                    'Anda tidak memiliki hak akses ke laporan divisi lain.'
-                );
-            }
+        if (
+            in_array(
+                $user->role,
+                [
+                    'manager_keuangan',
+                    'manager_operasional',
+                ],
+                true
+            ) &&
+            $complaint->division_id !== $user->division_id
+        ) {
+            abort(
+                403,
+                'Anda tidak memiliki akses ke laporan divisi lain.'
+            );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Role yang diperbolehkan
-        |--------------------------------------------------------------------------
-        */
         $allowedRoles = [
             'cc_room',
             'manager_keuangan',
@@ -1024,11 +957,7 @@ class ComplaintController extends Controller
             'pengguna',
         ];
 
-        if (!in_array(
-            $user->role,
-            $allowedRoles,
-            true
-        )) {
+        if (!in_array($user->role, $allowedRoles, true)) {
             abort(
                 403,
                 'Anda tidak memiliki akses ke laporan ini.'
@@ -1046,19 +975,14 @@ class ComplaintController extends Controller
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
-    | UPDATE STATUS OLEH CC ROOM
+    | UPDATE STATUS - CC ROOM
     |--------------------------------------------------------------------------
-    |
-    | Division ditentukan otomatis berdasarkan kategori.
-    |
     */
-    public function update(
-        Request $request,
-        $id
-    ) {
+
+    public function update(Request $request, $id)
+    {
         if (Auth::user()->role !== 'cc_room') {
             abort(
                 403,
@@ -1070,136 +994,76 @@ class ComplaintController extends Controller
             'category.division'
         )->findOrFail($id);
 
-        $validatedData = $request->validate([
-            'status' =>
-                'required|in:menunggu,diproses,ditolak,selesai',
+        $validated = $request->validate([
+            'status' => 'required|in:menunggu,diproses,ditolak,selesai',
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Tentukan divisi berdasarkan kategori
-        |--------------------------------------------------------------------------
-        */
         $divisionId = null;
 
-        if (
-            $validatedData['status'] ===
-            'diproses'
-        ) {
-
-            $divisionId =
-                $complaint
-                    ->category
-                    ->division_id;
+        if ($validated['status'] === 'diproses') {
+            $divisionId = $complaint->category->division_id;
 
             if (!$divisionId) {
                 return back()->withErrors([
                     'status' =>
-                        'Kategori laporan belum memiliki divisi penanganan.'
+                        'Kategori laporan belum memiliki divisi penanganan.',
                 ]);
             }
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Update complaint
-        |--------------------------------------------------------------------------
-        */
         $complaint->update([
-            'status' =>
-                $validatedData['status'],
-
-            'division_id' =>
-                $divisionId,
+            'status' => $validated['status'],
+            'division_id' => $divisionId,
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Riwayat
-        |--------------------------------------------------------------------------
-        */
-        if (
-            $validatedData['status'] ===
-            'diproses'
-        ) {
-
-            $divisionName =
-                $complaint
-                    ->category
-                    ->division
-                    ->name;
-
-            $historyNote =
+        $notes = [
+            'diproses' =>
                 'Laporan tervalidasi oleh CC Room. ' .
                 'Laporan diteruskan secara otomatis ke Divisi ' .
-                $divisionName .
-                '.';
+                $complaint->category->division->name . '.',
 
-        } elseif (
-            $validatedData['status'] ===
-            'selesai'
-        ) {
-
-            $historyNote =
+            'selesai' =>
                 'Bukti penyelesaian divalidasi oleh CC Room. ' .
-                'Tiket dinyatakan selesai dan ditutup.';
+                'Tiket dinyatakan selesai dan ditutup.',
 
-        } elseif (
-            $validatedData['status'] ===
-            'ditolak'
-        ) {
+            'ditolak' =>
+                'Laporan ditolak oleh CC Room (Tidak valid/Spam).',
 
-            $historyNote =
-                'Laporan ditolak oleh CC Room (Tidak valid/Spam).';
-
-        } else {
-
-            $historyNote =
-                'Status diperbarui oleh CC Room.';
-        }
+            'menunggu' =>
+                'Status diperbarui oleh CC Room.',
+        ];
 
         ComplaintHistory::create([
-            'complaint_id' =>
-                $complaint->id,
-
-            'status' =>
-                $validatedData['status'],
-
-            'note' =>
-                $historyNote,
-
-            'created_by' =>
-                Auth::id(),
+            'complaint_id' => $complaint->id,
+            'status' => $validated['status'],
+            'note' => $notes[$validated['status']],
+            'created_by' => Auth::id(),
         ]);
 
         return redirect()
             ->route('complaints.index')
             ->with(
                 'success',
-                'Status laporan ' .
-                $complaint->ticket_number .
-                ' berhasil diperbarui.'
+                "Status laporan {$complaint->ticket_number} berhasil diperbarui."
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
     | FORM TINDAK LANJUT MANAGER
     |--------------------------------------------------------------------------
     */
+
     public function resolve($id)
     {
         $user = Auth::user();
 
-        $allowedRoles = [
-            'manager_keuangan',
-            'manager_operasional',
-        ];
-
         if (!in_array(
             $user->role,
-            $allowedRoles,
+            [
+                'manager_keuangan',
+                'manager_operasional',
+            ],
             true
         )) {
             abort(
@@ -1212,32 +1076,16 @@ class ComplaintController extends Controller
             'division'
         )->findOrFail($id);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Security:
-        | Manager hanya boleh menangani aduan divisinya sendiri.
-        |--------------------------------------------------------------------------
-        */
-        if (
-            $complaint->division_id !==
-            $user->division_id
-        ) {
-            abort(
-                403,
-                'Anda tidak memiliki akses untuk menangani laporan divisi lain.'
-            );
-        }
+        $this->ensureManagerOwnsComplaint(
+            $complaint,
+            $user
+        );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Status harus dapat ditindaklanjuti
-        |--------------------------------------------------------------------------
-        */
         if (!in_array(
             $complaint->status,
             [
                 'diproses',
-                'menunggu_validasi_cc'
+                'menunggu_validasi_cc',
             ],
             true
         )) {
@@ -1253,26 +1101,24 @@ class ComplaintController extends Controller
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | SIMPAN TINDAK LANJUT MANAGER
     |--------------------------------------------------------------------------
     */
+
     public function storeResolution(
         Request $request,
         $id
     ) {
         $user = Auth::user();
 
-        $allowedRoles = [
-            'manager_keuangan',
-            'manager_operasional',
-        ];
-
         if (!in_array(
             $user->role,
-            $allowedRoles,
+            [
+                'manager_keuangan',
+                'manager_operasional',
+            ],
             true
         )) {
             abort(
@@ -1283,32 +1129,16 @@ class ComplaintController extends Controller
 
         $complaint = Complaint::findOrFail($id);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Security:
-        | Manager hanya boleh menangani aduan divisinya sendiri.
-        |--------------------------------------------------------------------------
-        */
-        if (
-            $complaint->division_id !==
-            $user->division_id
-        ) {
-            abort(
-                403,
-                'Anda tidak memiliki akses untuk menindaklanjuti aduan dari divisi lain.'
-            );
-        }
+        $this->ensureManagerOwnsComplaint(
+            $complaint,
+            $user
+        );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Status harus valid untuk ditindaklanjuti
-        |--------------------------------------------------------------------------
-        */
         if (!in_array(
             $complaint->status,
             [
                 'diproses',
-                'menunggu_validasi_cc'
+                'menunggu_validasi_cc',
             ],
             true
         )) {
@@ -1318,33 +1148,17 @@ class ComplaintController extends Controller
             );
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Validasi
-        |--------------------------------------------------------------------------
-        */
-        $validatedData = $request->validate([
-            'resolution_notes' =>
-                'required|string',
-
-            'resolution_proof' =>
-                'required|image|mimes:jpeg,png,jpg|max:2048',
-
+        $validated = $request->validate([
+            'resolution_notes' => 'required|string',
+            'resolution_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ], [
-
             'resolution_proof.image' =>
                 'File bukti perbaikan harus berupa gambar.',
 
             'resolution_proof.max' =>
                 'Ukuran foto maksimal adalah 2MB.',
-
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Simpan bukti
-        |--------------------------------------------------------------------------
-        */
         $proofPath = $request
             ->file('resolution_proof')
             ->store(
@@ -1352,75 +1166,43 @@ class ComplaintController extends Controller
                 'public'
             );
 
-        /*
-        |--------------------------------------------------------------------------
-        | Update complaint
-        |--------------------------------------------------------------------------
-        */
         $complaint->update([
-            'status' =>
-                'menunggu_validasi_cc',
-
-            'resolution_notes' =>
-                $validatedData['resolution_notes'],
-
-            'resolution_proof_path' =>
-                $proofPath,
+            'status' => 'menunggu_validasi_cc',
+            'resolution_notes' => $validated['resolution_notes'],
+            'resolution_proof_path' => $proofPath,
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Riwayat
-        |--------------------------------------------------------------------------
-        */
+        $managerName = $user->role === 'manager_keuangan'
+            ? 'Manager Keuangan'
+            : 'Manager Operasional';
+
         ComplaintHistory::create([
-            'complaint_id' =>
-                $complaint->id,
-
-            'status' =>
-                'menunggu_validasi_cc',
-
+            'complaint_id' => $complaint->id,
+            'status' => 'menunggu_validasi_cc',
             'note' =>
-                'Tindak lanjut telah dilakukan oleh ' .
-                (
-                    $user->role ===
-                    'manager_keuangan'
-                        ? 'Manager Keuangan'
-                        : 'Manager Operasional'
-                ) .
-                '. Menunggu validasi akhir dari CC Room.',
-
-            'created_by' =>
-                Auth::id(),
+                "Tindak lanjut telah dilakukan oleh {$managerName}. " .
+                'Menunggu validasi akhir dari CC Room.',
+            'created_by' => Auth::id(),
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Redirect ke dashboard manager masing-masing
-        |--------------------------------------------------------------------------
-        */
-        $route =
-            $user->role ===
-            'manager_keuangan'
-                ? 'manager.keuangan'
-                : 'manager.operasional';
+        $route = $user->role === 'manager_keuangan'
+            ? 'manager.keuangan'
+            : 'manager.operasional';
 
         return redirect()
             ->route($route)
             ->with(
                 'success',
-                'Bukti penyelesaian tiket ' .
-                $complaint->ticket_number .
-                ' berhasil dikirim ke CC Room.'
+                "Bukti penyelesaian tiket {$complaint->ticket_number} berhasil dikirim ke CC Room."
             );
     }
 
-
     /*
     |--------------------------------------------------------------------------
-    | FEEDBACK PENGGUNA
+    | ULASAN
     |--------------------------------------------------------------------------
     */
+
     public function feedback($id)
     {
         $complaint = Complaint::where(
@@ -1433,12 +1215,10 @@ class ComplaintController extends Controller
             )
             ->findOrFail($id);
 
-        if (
-            \App\Models\Feedback::where(
-                'complaint_id',
-                $id
-            )->exists()
-        ) {
+        if (Feedback::where(
+            'complaint_id',
+            $id
+        )->exists()) {
             return redirect()
                 ->route('complaints.index')
                 ->with(
@@ -1453,12 +1233,12 @@ class ComplaintController extends Controller
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
-    | SIMPAN FEEDBACK
+    | SIMPAN ULASAN
     |--------------------------------------------------------------------------
     */
+
     public function storeFeedback(
         Request $request,
         $id
@@ -1468,23 +1248,34 @@ class ComplaintController extends Controller
             Auth::id()
         )->findOrFail($id);
 
-        $validated = $request->validate([
-            'rating' =>
-                'required|integer|min:1|max:5',
+        if ($complaint->status !== 'selesai') {
+            abort(
+                403,
+                'Ulasan hanya dapat diberikan untuk laporan yang telah selesai.'
+            );
+        }
 
-            'comment' =>
-                'nullable|string',
+        if (Feedback::where(
+            'complaint_id',
+            $complaint->id
+        )->exists()) {
+            return redirect()
+                ->route('complaints.index')
+                ->with(
+                    'success',
+                    'Anda sudah memberikan ulasan untuk tiket ini.'
+                );
+        }
+
+        $validated = $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string',
         ]);
 
-        \App\Models\Feedback::create([
-            'complaint_id' =>
-                $complaint->id,
-
-            'rating' =>
-                $validated['rating'],
-
-            'comment' =>
-                $validated['comment'],
+        Feedback::create([
+            'complaint_id' => $complaint->id,
+            'rating' => $validated['rating'],
+            'comment' => $validated['comment'] ?? null,
         ]);
 
         return redirect()
@@ -1495,15 +1286,30 @@ class ComplaintController extends Controller
             );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | HELPER MANAGER
+    |--------------------------------------------------------------------------
+    */
+
+    private function ensureManagerOwnsComplaint(
+        Complaint $complaint,
+        $user
+    ) {
+        if ($complaint->division_id !== $user->division_id) {
+            abort(
+                403,
+                'Anda tidak memiliki akses ke laporan divisi lain.'
+            );
+        }
+    }
 
     /*
     |--------------------------------------------------------------------------
-    | LEGACY STORE RESOLVE
+    | LEGACY ROUTE
     |--------------------------------------------------------------------------
-    |
-    | Dipertahankan agar route lama tetap berjalan.
-    |
     */
+
     public function store_resolve(
         Request $request,
         $id

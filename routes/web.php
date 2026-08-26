@@ -1,61 +1,51 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-// 1. HALAMAN AWAL (Landing Page)
+// ============================================================
+// LANDING PAGE
+// ============================================================
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-// 2. REDIRECT SETELAH LOGIN
-Route::get('/dashboard', function () {
-    $role = auth()->user()->role;
+// ============================================================
+// DASHBOARD
+// ============================================================
 
-    return match ($role) {
+Route::get('/dashboard', function () {
+    return match (auth()->user()->role) {
         'manager_keuangan' => redirect()->route('manager.keuangan'),
         'manager_operasional' => redirect()->route('manager.operasional'),
         default => redirect()->route('complaints.index'),
     };
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware('auth')->name('dashboard');
 
-// 3. RUTE SISTEM ADUAN
+// ============================================================
+// SISTEM ADUAN
+// ============================================================
+
 Route::middleware('auth')->group(function () {
+
+    // Dashboard / Daftar Aduan
     Route::get('/aduan', [ComplaintController::class, 'index'])
         ->name('complaints.index');
 
-    // Dashboard Manager
-    Route::get('/manager/keuangan', [ComplaintController::class, 'dashboardManagerKeuangan'])
-        ->name('manager.keuangan');
-
-    Route::get('/manager/operasional', [ComplaintController::class, 'dashboardManagerOperasional'])
-        ->name('manager.operasional');
-
-    // Daftar Aduan Manager
-    Route::get('/manager/keuangan/aduan', [ComplaintController::class, 'aduanManagerKeuangan'])
-        ->name('manager.keuangan.aduan');
-
-    Route::get('/manager/operasional/aduan', [ComplaintController::class, 'aduanManagerOperasional'])
-        ->name('manager.operasional.aduan');
-
+    // Buat Aduan
     Route::get('/aduan/buat', [ComplaintController::class, 'create'])
         ->name('complaints.create');
 
     Route::post('/aduan', [ComplaintController::class, 'store'])
         ->name('complaints.store');
 
-    // Jenis Aduan Manager
-    Route::get('/manager/keuangan/jenis-aduan', [ComplaintController::class, 'jenisAduanManagerKeuangan'])
-        ->name('manager.keuangan.jenis');
-
-    Route::get('/manager/operasional/jenis-aduan', [ComplaintController::class, 'jenisAduanManagerOperasional'])
-        ->name('manager.operasional.jenis');
-
-    // Detail & Update
+    // Detail Aduan
     Route::get('/aduan/{id}', [ComplaintController::class, 'show'])
         ->name('complaints.show');
 
+    // Update Aduan - CC Room
     Route::put('/aduan/{id}', [ComplaintController::class, 'update'])
         ->name('complaints.update');
 
@@ -63,11 +53,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/aduan/{id}/tindak-lanjut', [ComplaintController::class, 'resolve'])
         ->name('complaints.resolve');
 
-    Route::put('/complaints/{id}/store-resolve', [ComplaintController::class, 'store_resolve'])
-        ->name('complaints.store_resolve');
-
     Route::put('/aduan/{id}/tindak-lanjut', [ComplaintController::class, 'storeResolution'])
         ->name('complaints.store_resolution');
+
+    // Legacy route
+    Route::put('/complaints/{id}/store-resolve', [ComplaintController::class, 'store_resolve'])
+        ->name('complaints.store_resolve');
 
     // Ulasan
     Route::get('/aduan/{id}/ulasan', [ComplaintController::class, 'feedback'])
@@ -75,10 +66,40 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/aduan/{id}/ulasan', [ComplaintController::class, 'storeFeedback'])
         ->name('complaints.store_feedback');
+
+    // ========================================================
+    // MANAGER KEUANGAN
+    // ========================================================
+
+    Route::get('/manager/keuangan', [ComplaintController::class, 'dashboardManagerKeuangan'])
+        ->name('manager.keuangan');
+
+    Route::get('/manager/keuangan/aduan', [ComplaintController::class, 'aduanManagerKeuangan'])
+        ->name('manager.keuangan.aduan');
+
+    Route::get('/manager/keuangan/jenis-aduan', [ComplaintController::class, 'jenisAduanManagerKeuangan'])
+        ->name('manager.keuangan.jenis');
+
+    // ========================================================
+    // MANAGER OPERASIONAL
+    // ========================================================
+
+    Route::get('/manager/operasional', [ComplaintController::class, 'dashboardManagerOperasional'])
+        ->name('manager.operasional');
+
+    Route::get('/manager/operasional/aduan', [ComplaintController::class, 'aduanManagerOperasional'])
+        ->name('manager.operasional.aduan');
+
+    Route::get('/manager/operasional/jenis-aduan', [ComplaintController::class, 'jenisAduanManagerOperasional'])
+        ->name('manager.operasional.jenis');
 });
 
-// 4. RUTE PROFIL BAWAAN BREEZE
+// ============================================================
+// PROFILE
+// ============================================================
+
 Route::middleware('auth')->group(function () {
+
     Route::get('/profile', [ProfileController::class, 'edit'])
         ->name('profile.edit');
 
@@ -88,5 +109,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
 });
+
+// ============================================================
+// AUTH
+// ============================================================
 
 require __DIR__.'/auth.php';

@@ -26,7 +26,7 @@
 
 <body class="min-h-screen bg-slate-100 text-slate-900 antialiased transition-colors duration-300 dark:bg-slate-950 dark:text-white">
 
-    <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-12">
+    <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:py-12">
 
         {{-- BACKGROUND GLOW --}}
         <div class="pointer-events-none absolute inset-0">
@@ -55,7 +55,11 @@
 
                 {{-- TITLE --}}
                 <div class="mt-6 text-center">
-                    <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                    <div class="mx-auto inline-flex items-center rounded-full border border-[#C8102E]/30 bg-[#C8102E]/10 px-3 py-1 text-xs font-medium text-[#C8102E] dark:text-red-300">
+                        Akun Pengguna
+                    </div>
+
+                    <h1 class="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                         Daftar Pengguna
                     </h1>
 
@@ -65,31 +69,13 @@
                     </p>
                 </div>
 
-                {{-- VALIDATION ERROR --}}
-                @if ($errors->any())
-                    <div class="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
-                        <p class="text-sm font-semibold text-red-600 dark:text-red-300">
-                            Pendaftaran gagal
-                        </p>
-
-                        <ul class="mt-2 list-inside list-disc text-xs text-red-600 dark:text-red-300">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
                 {{-- FORM --}}
-                <form method="POST" action="{{ route('register.store') }}" class="mt-7">
+                <form method="POST" action="{{ route('register') }}" class="mt-7">
                     @csrf
 
                     {{-- NAME --}}
                     <div>
-                        <label
-                            for="name"
-                            class="block text-sm font-medium text-slate-700 dark:text-slate-300"
-                        >
+                        <label for="name" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
                             Nama
                         </label>
 
@@ -102,7 +88,7 @@
                             autofocus
                             autocomplete="name"
                             placeholder="Masukkan nama Anda"
-                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500"
+                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm outline-none transition duration-200 focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500"
                         >
 
                         <x-input-error
@@ -113,10 +99,7 @@
 
                     {{-- EMAIL --}}
                     <div class="mt-5">
-                        <label
-                            for="email"
-                            class="block text-sm font-medium text-slate-700 dark:text-slate-300"
-                        >
+                        <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
                             Email
                         </label>
 
@@ -128,7 +111,7 @@
                             required
                             autocomplete="username"
                             placeholder="Masukkan email Anda"
-                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500"
+                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm outline-none transition duration-200 focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500"
                         >
 
                         <x-input-error
@@ -139,10 +122,7 @@
 
                     {{-- PASSWORD --}}
                     <div class="mt-5">
-                        <label
-                            for="password"
-                            class="block text-sm font-medium text-slate-700 dark:text-slate-300"
-                        >
+                        <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
                             Password
                         </label>
 
@@ -153,7 +133,7 @@
                             required
                             autocomplete="new-password"
                             placeholder="Buat password"
-                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500"
+                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm outline-none transition duration-200 focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500"
                         >
 
                         <x-input-error
@@ -164,10 +144,7 @@
 
                     {{-- PASSWORD CONFIRMATION --}}
                     <div class="mt-5">
-                        <label
-                            for="password_confirmation"
-                            class="block text-sm font-medium text-slate-700 dark:text-slate-300"
-                        >
+                        <label for="password_confirmation" class="block text-sm font-medium text-slate-700 dark:text-slate-300">
                             Konfirmasi Password
                         </label>
 
@@ -178,7 +155,7 @@
                             required
                             autocomplete="new-password"
                             placeholder="Ulangi password"
-                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500"
+                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm outline-none transition duration-200 focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500"
                         >
 
                         <x-input-error
@@ -204,7 +181,7 @@
 
                     <a
                         href="{{ route('login') }}"
-                        class="mt-2 inline-block text-sm font-semibold text-[#C8102E] transition hover:text-[#E21D3F]"
+                        class="mt-2 inline-block text-sm font-semibold text-[#C8102E] transition duration-200 hover:text-[#A50D25]"
                     >
                         Login Pengguna →
                     </a>
@@ -214,7 +191,7 @@
                 <div class="mt-5 text-center">
                     <a
                         href="{{ url('/') }}"
-                        class="text-sm text-slate-500 transition hover:text-slate-900 dark:hover:text-white"
+                        class="text-sm text-slate-500 transition duration-200 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                     >
                         ← Kembali ke halaman utama
                     </a>

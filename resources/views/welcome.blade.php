@@ -3,164 +3,629 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Lapor Trans Semarang') }}</title>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
+    <title>Sistem Aduan Trans Semarang</title>
 
-    <!-- Scripts (Tailwind CSS) -->
+    {{-- APPLY THEME BEFORE PAGE RENDERS --}}
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (
+            savedTheme === 'dark' ||
+            (!savedTheme && systemDark)
+        ) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
 </head>
-<body class="antialiased bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200 selection:bg-red-600 selection:text-white font-sans">
 
-    <!-- NAVBAR ATAS -->
-    <nav class="relative z-10 w-full px-6 py-4 flex justify-between items-center bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700">
-        <div class="flex items-center gap-3">
-            <!-- LOGO BARU DIMASUKKAN DI SINI -->
-            <img src="{{ asset('images/trans smg.png') }}" alt="Logo Trans Semarang" class="h-10 w-10 rounded-md object-cover shadow-sm">
-            <span class="font-bold text-xl tracking-tight text-gray-900 dark:text-white">Trans Semarang</span>
-        </div>
+<body
+    x-data="{
+        open: false,
+        loginModal: false
+    }"
+    @keydown.escape.window="loginModal = false"
+    class="bg-slate-100 text-slate-900 antialiased transition-colors duration-300 dark:bg-slate-950 dark:text-white"
+>
 
-        <div>
-            @if (Route::has('login'))
-                <!-- DITAMBAHKAN items-center AGAR TOMBOL MASUK SEJAJAR -->
-                <div class="flex items-center gap-4">
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="font-semibold text-red-700 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 transition">Dashboard Saya &rarr;</a>
-                    @else
-                        <a
-                            href="{{ route('login') }}"
-                            class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition"
-                        >
-                            Login Pengguna
-                        </a>
+    {{-- =========================================================
+         NAVBAR
+    ========================================================== --}}
+    <nav
+        class="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95"
+    >
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 items-center justify-between">
 
-                        <a
-                            href="{{ route('internal.login') }}"
-                            class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition"
-                        >
-                            Login Internal
-                        </a>
+                {{-- LOGO --}}
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center">
+                        <x-application-logo class="h-10 w-10" />
+                    </div>
 
-                        @if (Route::has('register'))
-                            <a
-                                href="{{ route('register') }}"
-                                class="font-semibold px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 transition shadow-sm"
-                            >
-                                Daftar Akun
-                            </a>
-                        @endif
-                    @endauth
+                    <div class="hidden sm:block">
+                        <div class="text-sm font-semibold text-slate-900 dark:text-white">
+                            Trans Semarang
+                        </div>
+
+                        <div class="text-xs text-slate-500 dark:text-slate-400">
+                            Sistem Aduan
+                        </div>
+                    </div>
                 </div>
-            @endif
+
+                {{-- DESKTOP NAVIGATION --}}
+                <div class="hidden items-center gap-5 md:flex">
+
+                    <a
+                        href="#beranda"
+                        class="text-sm text-slate-600 transition duration-200 hover:text-[#C8102E] dark:text-slate-300"
+                    >
+                        Beranda
+                    </a>
+
+                    <a
+                        href="#tentang"
+                        class="text-sm text-slate-600 transition duration-200 hover:text-[#C8102E] dark:text-slate-300"
+                    >
+                        Tentang
+                    </a>
+
+                    <a
+                        href="#alur"
+                        class="text-sm text-slate-600 transition duration-200 hover:text-[#C8102E] dark:text-slate-300"
+                    >
+                        Alur Aduan
+                    </a>
+
+                    {{-- THEME --}}
+                    <x-theme-toggle />
+
+                    {{-- LOGIN --}}
+                    <button
+                        type="button"
+                        @click="loginModal = true"
+                        class="rounded-lg bg-[#C8102E] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#C8102E]/20 transition duration-200 hover:bg-[#A50D25] hover:shadow-[#C8102E]/40 active:scale-95"
+                    >
+                        Masuk Sistem
+                    </button>
+                </div>
+
+                {{-- MOBILE MENU BUTTON --}}
+                <button
+                    type="button"
+                    @click="open = !open"
+                    class="inline-flex items-center justify-center rounded-lg p-2 text-slate-600 transition duration-200 hover:bg-[#C8102E]/10 hover:text-[#C8102E] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white md:hidden"
+                    aria-label="Toggle navigation"
+                >
+                    {{-- HAMBURGER --}}
+                    <svg
+                        x-show="!open"
+                        x-cloak
+                        class="h-6 w-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"
+                        />
+                    </svg>
+
+                    {{-- CLOSE --}}
+                    <svg
+                        x-show="open"
+                        x-cloak
+                        class="h-6 w-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    </svg>
+                </button>
+            </div>
+
+            {{-- MOBILE NAVIGATION --}}
+            <div
+                x-show="open"
+                x-cloak
+                x-transition
+                class="border-t border-slate-200 py-4 dark:border-slate-800 md:hidden"
+            >
+                <div class="flex flex-col gap-2">
+
+                    <a
+                        href="#beranda"
+                        @click="open = false"
+                        class="rounded-lg px-4 py-3 text-sm text-slate-600 transition duration-200 hover:bg-[#C8102E]/10 hover:text-[#C8102E] dark:text-slate-300"
+                    >
+                        Beranda
+                    </a>
+
+                    <a
+                        href="#tentang"
+                        @click="open = false"
+                        class="rounded-lg px-4 py-3 text-sm text-slate-600 transition duration-200 hover:bg-[#C8102E]/10 hover:text-[#C8102E] dark:text-slate-300"
+                    >
+                        Tentang
+                    </a>
+
+                    <a
+                        href="#alur"
+                        @click="open = false"
+                        class="rounded-lg px-4 py-3 text-sm text-slate-600 transition duration-200 hover:bg-[#C8102E]/10 hover:text-[#C8102E] dark:text-slate-300"
+                    >
+                        Alur Aduan
+                    </a>
+
+                    {{-- MOBILE THEME --}}
+                    <div
+                        class="mt-2 flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 dark:border-slate-800 dark:bg-slate-900/50"
+                    >
+                        <span class="text-sm text-slate-600 dark:text-slate-300">
+                            Tampilan
+                        </span>
+
+                        <x-theme-toggle />
+                    </div>
+
+                    {{-- MOBILE LOGIN --}}
+                    <button
+                        type="button"
+                        @click="open = false; loginModal = true"
+                        class="mt-2 rounded-lg bg-[#C8102E] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#C8102E]/20 transition duration-200 hover:bg-[#A50D25] hover:shadow-[#C8102E]/40 active:scale-95"
+                    >
+                        Masuk Sistem
+                    </button>
+                </div>
+            </div>
         </div>
     </nav>
 
-    <!-- KONTEN UTAMA -->
-    <main class="max-w-7xl mx-auto px-6 lg:px-8 py-12 space-y-20">
 
-        <!-- 1. HERO SECTION -->
-        <div class="text-center max-w-3xl mx-auto pt-10">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6">
-                Transportasi Massal Andalan <span class="text-red-700 dark:text-red-500">Kota Semarang</span>
-            </h1>
-            <p class="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-                Bus Rapid Transit (BRT) Trans Semarang hadir sebagai pionir transportasi darat yang nyaman, aman, cepat, dan murah untuk menunjang tingginya mobilitas masyarakat. Sampaikan apresiasi dan keluhan Anda demi layanan yang lebih baik.
-            </p>
-            <div class="flex justify-center gap-4">
-                <a href="{{ route('register') }}" class="px-6 py-3 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 shadow-md transition transform hover:-translate-y-0.5">
-                    + Buat Laporan Sekarang
-                </a>
-                <a href="#informasi" class="px-6 py-3 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-bold rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm transition">
-                    Pelajari Layanan
-                </a>
-            </div>
-        </div>
+    {{-- =========================================================
+         HERO
+    ========================================================== --}}
+    <main id="beranda">
 
-        <!-- 2. FITUR & KEUNGGULAN (KOMITMEN 3A) -->
-        <div id="informasi" class="pt-8">
-            <div class="text-center mb-10">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Visi Kami: Profesional & Dapat Diandalkan</h2>
-                <p class="text-gray-500 dark:text-gray-400 mt-2">Berkomitmen penuh memberikan pelayanan terbaik berstandar tinggi.</p>
+        <section class="relative overflow-hidden">
+
+            {{-- BACKGROUND GLOW --}}
+            <div class="pointer-events-none absolute inset-0">
+                <div
+                    class="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-[#C8102E]/10 blur-3xl"
+                ></div>
+
+                <div
+                    class="absolute right-0 top-1/3 h-72 w-72 rounded-full bg-[#C8102E]/10 blur-3xl"
+                ></div>
+
+                <div
+                    class="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-[#A50D25]/10 blur-3xl"
+                ></div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Card 1 -->
-                <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 text-center hover:shadow-md transition">
-                    <div class="w-14 h-14 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">💰</div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Sangat Terjangkau</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm">Harga tiket disubsidi 80% oleh Pemerintah Kota Semarang. Cukup bayar satu kali untuk rute jauh maupun dekat.</p>
-                </div>
+            <div
+                class="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-32"
+            >
+                <div class="mx-auto max-w-4xl text-center">
 
-                <!-- Card 2 -->
-                <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 text-center hover:shadow-md transition">
-                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">❄️</div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Kenyamanan Maksimal</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm">Menggunakan armada bus AC dengan kepastian waktu tunggu penumpang yang dapat diandalkan.</p>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 text-center hover:shadow-md transition">
-                    <div class="w-14 h-14 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">🛡️</div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Keamanan Terjamin</h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm">Pengguna jasa Bus Rapid Transit Trans Semarang memperoleh rasa aman dari segala gangguan selama perjalanan.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. TARIF & OPERASIONAL -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start bg-white dark:bg-gray-800 p-8 md:p-12 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-700">
-
-            <!-- Tarif -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Informasi Harga Tiket</h2>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                        <span class="font-medium text-gray-700 dark:text-gray-300">Tiket Umum (Tunai)</span>
-                        <span class="font-extrabold text-lg text-gray-900 dark:text-white">Rp 4.000,- <span class="text-xs font-normal text-gray-500"></span></span>
+                    {{-- BADGE --}}
+                    <div
+                        class="mb-6 inline-flex items-center rounded-full border border-[#C8102E]/30 bg-[#C8102E]/10 px-4 py-2 text-xs font-medium text-[#C8102E] dark:text-red-300"
+                    >
+                        Sistem Informasi Aduan Trans Semarang
                     </div>
-                    <div class="flex justify-between items-center p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg">
-                        <span class="font-medium text-red-700 dark:text-red-400">Tiket Umum (Cashless) <span class="ml-2 text-xs bg-red-200 dark:bg-red-800 text-red-900 dark:text-red-100 px-2 py-0.5 rounded">Lebih Hemat</span></span>
-                        <span class="font-extrabold text-lg text-red-700 dark:text-red-400">Rp 3.500,- <span class="text-xs font-normal opacity-70"></span></span>
+
+                    {{-- HEADING --}}
+                    <h1
+                        class="text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white"
+                    >
+                        Sampaikan Aduan,
+
+                        <span class="text-[#C8102E]">
+                            Tingkatkan Pelayanan
+                        </span>
+                    </h1>
+
+                    {{-- DESCRIPTION --}}
+                    <p
+                        class="mx-auto mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8 dark:text-slate-400"
+                    >
+                        Laporkan kendala, keluhan, maupun permasalahan
+                        terkait layanan Trans Semarang dengan mudah dan
+                        pantau proses penanganannya melalui satu sistem.
+                    </p>
+
+                    {{-- CTA --}}
+                    <div
+                        class="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center"
+                    >
+
+                        {{-- LOGIN --}}
+                        <button
+                            type="button"
+                            @click="loginModal = true"
+                            class="rounded-xl bg-[#C8102E] px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#C8102E]/20 transition duration-200 hover:bg-[#A50D25] hover:shadow-[#C8102E]/40 active:scale-95"
+                        >
+                            Masuk ke Sistem
+                        </button>
+
+                        {{-- ALUR --}}
+                        <a
+                            href="#alur"
+                            class="rounded-xl border border-slate-300 bg-white px-7 py-3.5 text-center text-sm font-semibold text-slate-700 transition duration-200 hover:border-[#C8102E]/50 hover:bg-[#C8102E]/5 hover:text-[#C8102E] active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
+                        >
+                            Lihat Alur Aduan
+                        </a>
                     </div>
-                    <div class="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                        <div class="flex flex-col">
-                            <span class="font-medium text-gray-700 dark:text-gray-300">Tiket Khusus</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Pelajar, Mahasiswa, Lansia, Veteran, KIA & Disabilitas</span>
+                </div>
+            </div>
+        </section>
+
+
+        {{-- =====================================================
+             TENTANG
+        ====================================================== --}}
+        <section
+            id="tentang"
+            class="border-t border-slate-200 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/50"
+        >
+            <div
+                class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+            >
+                <div class="mx-auto max-w-2xl text-center">
+
+                    <h2
+                        class="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white"
+                    >
+                        Sistem Aduan Terintegrasi
+                    </h2>
+
+                    <p
+                        class="mt-4 text-sm leading-6 text-slate-600 sm:text-base dark:text-slate-400"
+                    >
+                        Setiap aduan akan diteruskan kepada divisi yang
+                        sesuai berdasarkan jenis permasalahan yang dilaporkan.
+                    </p>
+                </div>
+
+                {{-- CARDS --}}
+                <div class="mt-10 grid gap-6 md:grid-cols-3">
+
+                    {{-- CARD 1 --}}
+                    <div
+                        class="group rounded-2xl border border-slate-200 bg-white p-6 transition duration-200 hover:-translate-y-1 hover:border-[#C8102E]/40 hover:shadow-lg hover:shadow-[#C8102E]/10 dark:border-slate-800 dark:bg-slate-900"
+                    >
+                        <div
+                            class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-[#C8102E]/10 text-xl transition duration-200 group-hover:bg-[#C8102E]/20"
+                        >
+                            📝
                         </div>
-                        <span class="font-extrabold text-lg text-gray-900 dark:text-white">Rp 1.000,- <span class="text-xs font-normal text-gray-500"></span></span>
+
+                        <h3 class="font-semibold text-slate-900 dark:text-white">
+                            Laporkan Aduan
+                        </h3>
+
+                        <p
+                            class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400"
+                        >
+                            Sampaikan keluhan atau permasalahan layanan
+                            dengan informasi yang lengkap.
+                        </p>
+                    </div>
+
+                    {{-- CARD 2 --}}
+                    <div
+                        class="group rounded-2xl border border-slate-200 bg-white p-6 transition duration-200 hover:-translate-y-1 hover:border-[#C8102E]/40 hover:shadow-lg hover:shadow-[#C8102E]/10 dark:border-slate-800 dark:bg-slate-900"
+                    >
+                        <div
+                            class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-[#C8102E]/10 text-xl transition duration-200 group-hover:bg-[#C8102E]/20"
+                        >
+                            🔄
+                        </div>
+
+                        <h3 class="font-semibold text-slate-900 dark:text-white">
+                            Diproses Divisi Terkait
+                        </h3>
+
+                        <p
+                            class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400"
+                        >
+                            Aduan diteruskan secara otomatis kepada divisi
+                            yang bertanggung jawab.
+                        </p>
+                    </div>
+
+                    {{-- CARD 3 --}}
+                    <div
+                        class="group rounded-2xl border border-slate-200 bg-white p-6 transition duration-200 hover:-translate-y-1 hover:border-[#C8102E]/40 hover:shadow-lg hover:shadow-[#C8102E]/10 dark:border-slate-800 dark:bg-slate-900"
+                    >
+                        <div
+                            class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-[#C8102E]/10 text-xl transition duration-200 group-hover:bg-[#C8102E]/20"
+                        >
+                            ✅
+                        </div>
+
+                        <h3 class="font-semibold text-slate-900 dark:text-white">
+                            Pantau Penyelesaian
+                        </h3>
+
+                        <p
+                            class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400"
+                        >
+                            Pantau perkembangan laporan hingga proses
+                            penyelesaian selesai.
+                        </p>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Jam & Rute -->
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Waktu Operasional</h2>
-                <ul class="space-y-6 relative border-l-2 border-gray-200 dark:border-gray-700 ml-3">
-                    <li class="pl-6 relative">
-                        <div class="absolute w-4 h-4 bg-red-600 rounded-full -left-[9px] top-1 border-4 border-white dark:border-gray-800"></div>
-                        <h4 class="font-bold text-gray-900 dark:text-white">Layanan Reguler (Koridor 1 - Feeder 4)</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Beroperasi setiap hari mulai pukul <span class="font-semibold">05.30 WIB - 18.30 WIB</span>.</p>
-                    </li>
-                    <li class="pl-6 relative">
-                        <div class="absolute w-4 h-4 bg-yellow-500 rounded-full -left-[9px] top-1 border-4 border-white dark:border-gray-800"></div>
-                        <h4 class="font-bold text-gray-900 dark:text-white">Layanan Mangkang Malam</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Terminal Mangkang - Simpang Lima, beroperasi pukul <span class="font-semibold">17.30 WIB - 23.30 WIB</span>.</p>
-                    </li>
-                </ul>
+
+        {{-- =====================================================
+             ALUR
+        ====================================================== --}}
+        <section id="alur">
+            <div
+                class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+            >
+                <div class="mx-auto max-w-2xl text-center">
+
+                    <h2
+                        class="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white"
+                    >
+                        Alur Penanganan Aduan
+                    </h2>
+
+                    <p
+                        class="mt-4 text-sm text-slate-600 sm:text-base dark:text-slate-400"
+                    >
+                        Proses penanganan aduan dilakukan secara bertahap
+                        hingga laporan dinyatakan selesai.
+                    </p>
+                </div>
+
+                {{-- STEPS --}}
+                <div class="mt-10 grid gap-8 md:grid-cols-4">
+
+                    {{-- STEP 1 --}}
+                    <div class="text-center">
+                        <div
+                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#C8102E] font-bold text-white shadow-lg shadow-[#C8102E]/20"
+                        >
+                            1
+                        </div>
+
+                        <h3 class="mt-4 font-semibold text-slate-900 dark:text-white">
+                            Aduan Dikirim
+                        </h3>
+
+                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                            Pengguna mengirim laporan melalui sistem.
+                        </p>
+                    </div>
+
+                    {{-- STEP 2 --}}
+                    <div class="text-center">
+                        <div
+                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#C8102E] font-bold text-white shadow-lg shadow-[#C8102E]/20"
+                        >
+                            2
+                        </div>
+
+                        <h3 class="mt-4 font-semibold text-slate-900 dark:text-white">
+                            Validasi CC Room
+                        </h3>
+
+                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                            Aduan diperiksa dan divalidasi.
+                        </p>
+                    </div>
+
+                    {{-- STEP 3 --}}
+                    <div class="text-center">
+                        <div
+                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#C8102E] font-bold text-white shadow-lg shadow-[#C8102E]/20"
+                        >
+                            3
+                        </div>
+
+                        <h3 class="mt-4 font-semibold text-slate-900 dark:text-white">
+                            Ditangani Divisi
+                        </h3>
+
+                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                            Aduan diteruskan kepada divisi terkait.
+                        </p>
+                    </div>
+
+                    {{-- STEP 4 --}}
+                    <div class="text-center">
+                        <div
+                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#C8102E] font-bold text-white shadow-lg shadow-[#C8102E]/20"
+                        >
+                            4
+                        </div>
+
+                        <h3 class="mt-4 font-semibold text-slate-900 dark:text-white">
+                            Selesai
+                        </h3>
+
+                        <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                            Hasil penanganan divalidasi oleh CC Room.
+                        </p>
+                    </div>
+                </div>
             </div>
-
-        </div>
+        </section>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-20 py-8">
-        <div class="max-w-7xl mx-auto px-6 text-center text-sm text-gray-500 dark:text-gray-400">
-            &copy; {{ date('Y') }} BLU UPTD Trans Semarang. Semua hak cipta dilindungi. <br>
-            Layanan Pengaduan & Aspirasi Masyarakat.
+
+    {{-- =========================================================
+         FOOTER
+    ========================================================== --}}
+    <footer
+        class="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"
+    >
+        <div
+            class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"
+        >
+            <div
+                class="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left"
+            >
+                <div>
+                    <p class="text-sm font-medium text-slate-900 dark:text-white">
+                        Trans Semarang
+                    </p>
+
+                    <p class="mt-1 text-xs text-slate-500">
+                        Sistem Informasi Aduan
+                    </p>
+                </div>
+
+                <p class="text-xs text-slate-500">
+                    © {{ date('Y') }} Trans Semarang
+                </p>
+            </div>
         </div>
     </footer>
+
+
+    {{-- =========================================================
+         LOGIN MODAL
+    ========================================================== --}}
+    <div
+        x-show="loginModal"
+        x-cloak
+        x-transition.opacity
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm"
+    >
+        {{-- MODAL BOX --}}
+        <div
+            x-show="loginModal"
+            x-transition
+            @click.outside="loginModal = false"
+            class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:p-8"
+        >
+
+            {{-- HEADER --}}
+            <div class="text-center">
+
+                <div
+                    class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#C8102E]/10 text-2xl"
+                >
+                    🔐
+                </div>
+
+                <h2
+                    class="mt-5 text-xl font-bold text-slate-900 dark:text-white"
+                >
+                    Masuk ke Sistem
+                </h2>
+
+                <p
+                    class="mt-2 text-sm text-slate-600 dark:text-slate-400"
+                >
+                    Pilih jenis akun yang ingin digunakan.
+                </p>
+            </div>
+
+
+            {{-- OPTIONS --}}
+            <div class="mt-7 space-y-3">
+
+                {{-- PENGGUNA --}}
+                <a
+                    href="{{ route('login') }}"
+                    class="group flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 transition duration-200 hover:border-[#C8102E]/50 hover:bg-[#C8102E]/10 hover:shadow-lg hover:shadow-[#C8102E]/10 active:scale-[0.98] dark:border-slate-700 dark:bg-slate-800/50"
+                >
+                    <div
+                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#C8102E]/10 text-xl transition duration-200 group-hover:bg-[#C8102E]/20"
+                    >
+                        👤
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                        <div class="font-semibold text-slate-900 dark:text-white">
+                            Pengguna
+                        </div>
+
+                        <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            Buat dan pantau aduan Anda.
+                        </div>
+                    </div>
+
+                    <div
+                        class="text-slate-400 transition duration-200 group-hover:translate-x-1 group-hover:text-[#C8102E]"
+                    >
+                        →
+                    </div>
+                </a>
+
+
+                {{-- INTERNAL --}}
+                <a
+                    href="{{ route('internal.login') }}"
+                    class="group flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 transition duration-200 hover:border-[#C8102E]/50 hover:bg-[#C8102E]/10 hover:shadow-lg hover:shadow-[#C8102E]/10 active:scale-[0.98] dark:border-slate-700 dark:bg-slate-800/50"
+                >
+                    <div
+                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#C8102E]/10 text-xl transition duration-200 group-hover:bg-[#C8102E]/20"
+                    >
+                        🏢
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                        <div class="font-semibold text-slate-900 dark:text-white">
+                            Login Internal
+                        </div>
+
+                        <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            Untuk CC Room dan Manager.
+                        </div>
+                    </div>
+
+                    <div
+                        class="text-slate-400 transition duration-200 group-hover:translate-x-1 group-hover:text-[#C8102E]"
+                    >
+                        →
+                    </div>
+                </a>
+            </div>
+
+
+            {{-- CANCEL --}}
+            <button
+                type="button"
+                @click="loginModal = false"
+                class="mt-6 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-600 transition duration-200 hover:border-slate-400 hover:bg-slate-100 hover:text-slate-900 active:scale-[0.98] dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
+            >
+                Batal
+            </button>
+        </div>
+    </div>
 
 </body>
 </html>

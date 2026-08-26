@@ -36,24 +36,44 @@ class LoginRequest extends FormRequest
     /**
      * Attempt to authenticate the request's credentials.
      *
+     * @param array<string>|null $allowedRoles
+     *
      * @throws ValidationException
      */
     public function authenticate(?array $allowedRoles = null): void
     {
         $this->ensureIsNotRateLimited();
 
+        /*
+         * Coba autentikasi menggunakan email dan password.
+         */
         if (! Auth::attempt(
             $this->only('email', 'password'),
             $this->boolean('remember')
         )) {
             RateLimiter::hit($this->throttleKey());
 
+            /*
+             * Error kredensial ditampilkan di bawah Password.
+             */
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'password' => trans('auth.failed'),
             ]);
         }
 
-        // Batasi role berdasarkan halaman login
+        /*
+         * Batasi role berdasarkan halaman login.
+         *
+         * Login Pengguna:
+         *     ['pengguna']
+         *
+         * Login Internal:
+         *     [
+         *         'cc_room',
+         *         'manager_keuangan',
+         *         'manager_operasional',
+         *     ]
+         */
         if (
             $allowedRoles !== null &&
             ! in_array(Auth::user()->role, $allowedRoles, true)
@@ -61,10 +81,13 @@ class LoginRequest extends FormRequest
             Auth::logout();
 
             throw ValidationException::withMessages([
-                'email' => 'Akun tidak memiliki akses ke halaman login ini.',
+                'password' => 'Akun tidak memiliki akses ke halaman login ini.',
             ]);
         }
 
+        /*
+         * Login berhasil, reset rate limiter.
+         */
         RateLimiter::clear($this->throttleKey());
     }
 
@@ -84,7 +107,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'password' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -92,7 +115,7 @@ class LoginRequest extends FormRequest
     }
 
     /**
-     * Get the rate limiting throttle key for the request.
+     * Get the login throttle key.
      */
     public function throttleKey(): string
     {

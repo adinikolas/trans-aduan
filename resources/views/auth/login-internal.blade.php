@@ -1,141 +1,254 @@
-<x-guest-layout>
-    <div class="mb-6 text-center">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-            Login Internal
-        </h2>
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
-        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            CC Room dan Manager
-        </p>
-    </div>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <title>Login Internal - Sistem Aduan Trans Semarang</title>
 
-    <form method="POST" action="{{ route('internal.login.store') }}">
-        @csrf
+    <script>
+        const savedTheme = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-        <!-- Email -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
+        if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
-            <x-text-input
-                id="email"
-                class="block mt-1 w-full"
-                type="email"
-                name="email"
-                :value="old('email')"
-                required
-                autofocus
-                autocomplete="username"
-            />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-            <x-input-error
-                :messages="$errors->get('email')"
-                class="mt-2"
-            />
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-slate-100 text-slate-900 antialiased transition-colors duration-300 dark:bg-slate-950 dark:text-white">
+
+    <div class="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:px-6 sm:py-12">
+
+        {{-- BACKGROUND GLOW --}}
+        <div class="pointer-events-none absolute inset-0 overflow-hidden">
+
+            <div class="absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-[#C8102E]/10 blur-3xl"></div>
+
+            <div class="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-[#A50D25]/10 blur-3xl"></div>
+
+            <div class="absolute bottom-1/3 left-0 h-64 w-64 rounded-full bg-[#C8102E]/5 blur-3xl"></div>
+
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input
-                id="password"
-                class="block mt-1 w-full"
-                type="password"
-                name="password"
-                required
-                autocomplete="current-password"
-            />
-
-            <x-input-error
-                :messages="$errors->get('password')"
-                class="mt-2"
-            />
+        {{-- THEME TOGGLE --}}
+        <div class="absolute right-4 top-4 z-20 sm:right-6 sm:top-6">
+            <x-theme-toggle />
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input
-                    id="remember_me"
-                    type="checkbox"
-                    class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-red-600 shadow-sm focus:ring-red-500"
-                    name="remember"
-                >
+        {{-- LOGIN CONTAINER --}}
+        <div class="relative z-10 w-full max-w-md">
 
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">
-                    {{ __('Remember me') }}
-                </span>
-            </label>
-        </div>
+            {{-- CARD --}}
+            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-900/10 backdrop-blur transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900/95 dark:shadow-black/30 sm:p-8">
 
-        <!-- Submit -->
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a
-                    class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-                    href="{{ route('password.request') }}"
-                >
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
+                {{-- LOGO --}}
+                <div class="flex justify-center">
+                    <div class="flex h-16 w-16 items-center justify-center">
+                        <x-application-logo class="h-16 w-16" />
+                    </div>
+                </div>
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
+                {{-- TITLE --}}
+                <div class="mt-6 text-center">
 
-    <!-- Role Information -->
-    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <p class="text-xs text-center text-gray-500 dark:text-gray-400 mb-3">
-            Login ini digunakan oleh:
-        </p>
+                    <div class="mx-auto inline-flex items-center rounded-full border border-[#C8102E]/30 bg-[#C8102E]/10 px-3 py-1 text-xs font-medium text-[#C8102E] dark:text-red-300">
+                        Akses Internal
+                    </div>
 
-        <div class="grid grid-cols-1 gap-2">
-            <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-3 text-center">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    CC Room
-                </span>
+                    <h1 class="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
+                        Login Internal
+                    </h1>
+
+                    <p class="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-400">
+                        Digunakan oleh CC Room dan Manager Trans Semarang.
+                    </p>
+
+                </div>
+
+                {{-- SESSION STATUS --}}
+                <x-auth-session-status
+                    class="mt-5"
+                    :status="session('status')"
+                />
+
+                {{-- FORM --}}
+                <form method="POST" action="{{ route('internal.login.store') }}" class="mt-7">
+                    @csrf
+
+                    {{-- EMAIL --}}
+                    <div>
+                        <label
+                            for="email"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                        >
+                            Email
+                        </label>
+
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email') }}"
+                            required
+                            autofocus
+                            autocomplete="username"
+                            placeholder="Masukkan email internal"
+                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm outline-none transition duration-200 focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500"
+                        >
+
+                        <x-input-error
+                            :messages="$errors->get('email')"
+                            class="mt-2"
+                        />
+                    </div>
+
+                    {{-- PASSWORD --}}
+                    <div class="mt-5">
+                        <label
+                            for="password"
+                            class="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                        >
+                            Password
+                        </label>
+
+                        <input
+                            id="password"
+                            type="password"
+                            name="password"
+                            required
+                            autocomplete="current-password"
+                            placeholder="Masukkan password internal"
+                            class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder-slate-400 shadow-sm outline-none transition duration-200 focus:border-[#C8102E] focus:ring-2 focus:ring-[#C8102E]/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder-slate-500"
+                        >
+
+                        {{-- LOGIN CREDENTIAL ERROR --}}
+                        @if ($errors->has('password'))
+                            <div class="mt-2 text-sm text-red-600 dark:text-red-400">
+                                {{ $errors->first('password') }}
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- REMEMBER --}}
+                    <div class="mt-5">
+
+                        <label
+                            for="remember_me"
+                            class="inline-flex cursor-pointer items-center"
+                        >
+                            <input
+                                id="remember_me"
+                                type="checkbox"
+                                name="remember"
+                                class="h-4 w-4 rounded border-slate-300 bg-white text-[#C8102E] shadow-sm focus:ring-[#C8102E] dark:border-slate-700 dark:bg-slate-950"
+                            >
+
+                            <span class="ms-2 text-sm text-slate-500 dark:text-slate-400">
+                                Ingat saya
+                            </span>
+                        </label>
+
+                    </div>
+
+                    {{-- SUBMIT --}}
+                    <button
+                        type="submit"
+                        class="mt-7 w-full rounded-xl bg-[#C8102E] px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#C8102E]/20 transition duration-200 hover:bg-[#A50D25] hover:shadow-[#C8102E]/40 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900"
+                    >
+                        Masuk sebagai Internal
+                    </button>
+
+                </form>
+
+                {{-- ROLE INFORMATION --}}
+                <div class="mt-7 border-t border-slate-200 pt-6 dark:border-slate-800">
+
+                    <p class="mb-3 text-center text-xs text-slate-500 dark:text-slate-500">
+                        Login ini digunakan oleh
+                    </p>
+
+                    <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center transition duration-200 hover:border-[#C8102E]/40 hover:bg-[#C8102E]/5 dark:border-slate-800 dark:bg-slate-950/50">
+
+                            <span class="text-xs font-medium text-slate-600 dark:text-slate-300">
+                                CC Room
+                            </span>
+
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center transition duration-200 hover:border-[#C8102E]/40 hover:bg-[#C8102E]/5 dark:border-slate-800 dark:bg-slate-950/50">
+
+                            <span class="text-xs font-medium text-slate-600 dark:text-slate-300">
+                                Manager Keuangan
+                            </span>
+
+                        </div>
+
+                        <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-center transition duration-200 hover:border-[#C8102E]/40 hover:bg-[#C8102E]/5 dark:border-slate-800 dark:bg-slate-950/50">
+
+                            <span class="text-xs font-medium text-slate-600 dark:text-slate-300">
+                                Manager Operasional
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {{-- PUBLIC LOGIN --}}
+                <div class="mt-6 text-center">
+
+                    <p class="text-sm text-slate-500 dark:text-slate-400">
+                        Anda pengguna umum?
+                    </p>
+
+                    <a
+                        href="{{ route('login') }}"
+                        class="mt-2 inline-block text-sm font-semibold text-[#C8102E] transition duration-200 hover:text-[#A50D25] dark:text-[#E21D3F] dark:hover:text-red-300"
+                    >
+                        Login Pengguna Umum →
+                    </a>
+
+                </div>
+
+                {{-- BACK HOME --}}
+                <div class="mt-5 text-center">
+
+                    <a
+                        href="{{ url('/') }}"
+                        class="text-sm text-slate-500 transition duration-200 hover:text-slate-900 dark:text-slate-500 dark:hover:text-white"
+                    >
+                        ← Kembali ke halaman utama
+                    </a>
+
+                </div>
+
             </div>
 
-            <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-3 text-center">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Manager Keuangan
-                </span>
+            {{-- FOOTER --}}
+            <div class="mt-6 text-center">
+
+                <p class="text-xs text-slate-500 dark:text-slate-600">
+                    © {{ date('Y') }} Trans Semarang
+                </p>
+
             </div>
 
-            <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-3 text-center">
-                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Manager Operasional
-                </span>
-            </div>
         </div>
+
     </div>
 
-    <!-- Public Login -->
-    <div class="mt-6 text-center">
-        <p class="text-sm text-gray-600 dark:text-gray-400">
-            Anda pengguna umum?
-        </p>
-
-        <a
-            href="{{ route('login') }}"
-            class="inline-block mt-2 text-sm font-semibold text-red-700 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-        >
-            Login Pengguna Umum →
-        </a>
-    </div>
-
-    <!-- Back to Home -->
-    <div class="mt-4 text-center">
-        <a
-            href="{{ url('/') }}"
-            class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-        >
-            ← Kembali ke halaman utama
-        </a>
-    </div>
-</x-guest-layout>
+</body>
+</html>

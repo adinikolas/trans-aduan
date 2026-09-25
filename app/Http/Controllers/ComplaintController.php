@@ -95,62 +95,77 @@ class ComplaintController extends Controller
         |--------------------------------------------------------------------------
         */
         if ($user->role === 'cc_room') {
-            $totalAduan = Complaint::count();
 
-            $menunggu = Complaint::where(
-                'status',
-                'menunggu'
-            )->count();
+        $totalAduan = Complaint::count();
 
-            $diproses = Complaint::whereIn(
-                'status',
-                [
-                    'diproses',
-                    'menunggu_validasi_cc',
-                ]
-            )->count();
+        $menunggu = Complaint::where(
+            'status',
+            'menunggu'
+        )->count();
 
-            $selesai = Complaint::where(
-                'status',
-                'selesai'
-            )->count();
+        $diproses = Complaint::where(
+            'status',
+            'diproses'
+        )->count();
 
-            $complaints = Complaint::with([
+        $menungguValidasi = Complaint::where(
+            'status',
+            'menunggu_validasi_cc'
+        )->count();
+
+        $selesai = Complaint::where(
+            'status',
+            'selesai'
+        )->count();
+
+        $complaints = Complaint::with([
                 'user',
                 'category',
                 'division',
             ])
-                ->when($request->search, function ($query, $search) {
-                    $query->where(function ($q) use ($search) {
-                        $q->where(
-                            'ticket_number',
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where(
+                        'ticket_number',
+                        'like',
+                        '%' . $search . '%'
+                    )
+                    ->orWhere(
+                        'title',
+                        'like',
+                        '%' . $search . '%'
+                    )
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where(
+                            'name',
                             'like',
-                            "%{$search}%"
-                        )->orWhere(
-                            'title',
-                            'like',
-                            "%{$search}%"
+                            '%' . $search . '%'
                         );
                     });
-                })
-                ->when($request->status, function ($query, $status) {
-                    $query->where('status', $status);
-                })
-                ->latest()
-                ->paginate(10)
-                ->withQueryString();
+                });
+            })
+            ->when($request->status, function ($query, $status) {
+                $query->where(
+                    'status',
+                    $status
+                );
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
 
-            return view(
-                'complaints.index_cc',
-                compact(
-                    'complaints',
-                    'totalAduan',
-                    'menunggu',
-                    'diproses',
-                    'selesai'
-                )
-            );
-        }
+        return view(
+            'complaints.index_cc',
+            compact(
+                'complaints',
+                'totalAduan',
+                'menunggu',
+                'diproses',
+                'menungguValidasi',
+                'selesai'
+            )
+        );
+    }
 
         /*
         |--------------------------------------------------------------------------
@@ -984,67 +999,133 @@ class ComplaintController extends Controller
     public function update(Request $request, $id)
     {
         if (Auth::user()->role !== 'cc_room') {
-            abort(
-                403,
-                'Hanya CC Room yang dapat memperbarui status laporan.'
-            );
+            abort(403, 'Hanya CC Room yang dapat memperbarui status laporan.');
         }
 
-        $complaint = Complaint::with(
-            'category.division'
-        )->findOrFail($id);
+        $complaint = Complaint::with('category.division')->findOrFail($id);
 
         $validated = $request->validate([
-            'status' => 'required|in:menunggu,diproses,ditolak,selesai',
+            'status' => 'required|in:diproses,ditolak,selesai',
         ]);
 
-        $divisionId = null;
+        $oldStatus = $complaint->status;
 
-        if ($validated['status'] === 'diproses') {
-            $divisionId = $complaint->category->division_id;
+        /*
+        |--------------------------------------------------------------------------
+        | 1. VALIDASI AWAL
+        |--------------------------------------------------------------------------
+        */
+        if ($oldStatus === 'menunggu') {
 
-            if (!$divisionId) {
+            if ($validated['status'] === 'diproses') {
+
+                $divisionId = $complaint->category->division_id;
+
+                if (!$divisionId) {
+                    return back()->withErrors([
+                        'status' =>
+                            'Kategori laporan belum memiliki divisi penanganan.'
+                    ]);
+                }
+
+                $complaint->update([
+                    'status' => 'diproses',
+                    'division_id' => $divisionId,
+                ]);
+
+                $divisionName = $complaint->category->division->name;
+
+                $historyNote =
+                    'Laporan tervalidasi oleh CC Room dan diteruskan ' .
+                    'secara otomatis ke Divisi ' .
+                    $divisionName .
+                    '.';
+
+                $historyStatus = 'diproses';
+
+            } else {
+
+                $complaint->update([
+                    'status' => 'ditolak',
+                ]);
+
+                $historyNote =
+                    'Laporan ditolak oleh CC Room karena tidak valid atau spam.';
+
+                $historyStatus = 'ditolak';
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. VALIDASI AKHIR
+        |--------------------------------------------------------------------------
+        */
+        elseif ($oldStatus === 'menunggu_validasi_cc') {
+
+            if ($validated['status'] === 'selesai') {
+
+                $complaint->update([
+                    'status' => 'selesai',
+                ]);
+
+                $historyNote =
+                    'Bukti penyelesaian telah divalidasi oleh CC Room. ' .
+                    'Tiket dinyatakan selesai dan ditutup.';
+
+                $historyStatus = 'selesai';
+
+            } elseif ($validated['status'] === 'diproses') {
+
+                $complaint->update([
+                    'status' => 'diproses',
+                ]);
+
+                $historyNote =
+                    'Hasil tindak lanjut belum dapat divalidasi oleh CC Room. ' .
+                    'Aduan dikembalikan kepada Manager untuk tindak lanjut kembali.';
+
+                $historyStatus = 'diproses';
+
+            } else {
+
                 return back()->withErrors([
-                    'status' =>
-                        'Kategori laporan belum memiliki divisi penanganan.',
+                    'status' => 'Status tidak valid untuk proses ini.'
                 ]);
             }
         }
 
-        $complaint->update([
-            'status' => $validated['status'],
-            'division_id' => $divisionId,
-        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | 3. STATUS TIDAK SESUAI
+        |--------------------------------------------------------------------------
+        */
+        else {
 
-        $notes = [
-            'diproses' =>
-                'Laporan tervalidasi oleh CC Room. ' .
-                'Laporan diteruskan secara otomatis ke Divisi ' .
-                $complaint->category->division->name . '.',
+            return back()->withErrors([
+                'status' => 'Aduan tidak berada pada tahap yang dapat diproses.'
+            ]);
+        }
 
-            'selesai' =>
-                'Bukti penyelesaian divalidasi oleh CC Room. ' .
-                'Tiket dinyatakan selesai dan ditutup.',
-
-            'ditolak' =>
-                'Laporan ditolak oleh CC Room (Tidak valid/Spam).',
-
-            'menunggu' =>
-                'Status diperbarui oleh CC Room.',
-        ];
-
+        /*
+        |--------------------------------------------------------------------------
+        | 4. SIMPAN RIWAYAT
+        |--------------------------------------------------------------------------
+        */
         ComplaintHistory::create([
             'complaint_id' => $complaint->id,
-            'status' => $validated['status'],
-            'note' => $notes[$validated['status']],
+            'status' => $historyStatus,
+            'note' => $historyNote,
             'created_by' => Auth::id(),
         ]);
 
         return redirect()
-            ->route('complaints.index')
+            ->route('complaints.show', $complaint->id)
             ->with(
                 'success',
-                "Status laporan {$complaint->ticket_number} berhasil diperbarui."
+                'Status laporan ' .
+                $complaint->ticket_number .
+                ' berhasil diperbarui.'
             );
     }
 

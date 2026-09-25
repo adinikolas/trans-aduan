@@ -17,8 +17,21 @@
                 </p>
             </div>
 
+
+            {{-- =================================================
+                TOMBOL KEMBALI SESUAI ROLE
+            ================================================== --}}
+
+            @php
+                $backRoute = match(Auth::user()->role) {
+                    'manager_keuangan' => route('manager.keuangan.aduan'),
+                    'manager_operasional' => route('manager.operasional.aduan'),
+                    default => route('complaints.index'),
+                };
+            @endphp
+
             <a
-                href="{{ route('complaints.index') }}"
+                href="{{ $backRoute }}"
                 class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-[#C8102E] dark:text-gray-400 dark:hover:text-[#E21D3F]"
             >
                 ← Kembali
@@ -61,7 +74,11 @@
                     <ul class="mt-2 list-inside list-disc text-sm text-red-600 dark:text-red-400">
 
                         @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
+
+                            <li>
+                                {{ $error }}
+                            </li>
+
                         @endforeach
 
                     </ul>
@@ -197,7 +214,8 @@
 
                                 @if($complaint->division)
 
-                                    <span class="mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold
+                                    <span
+                                        class="mt-1 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold
                                         {{
                                             $complaint->division->name === 'Keuangan'
                                                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'

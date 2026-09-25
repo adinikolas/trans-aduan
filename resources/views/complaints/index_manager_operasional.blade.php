@@ -1,39 +1,46 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    Dashboard Manager Operasional
-                </h2>
 
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    Penanganan aduan terkait armada, fasilitas, pengemudi, dan operasional layanan.
-                </p>
-            </div>
+    <x-slot name="header">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Aduan Operasional
+            </h2>
+
+            <p class="mt-1 text-sm sm:text-base text-slate-500 dark:text-slate-400">
+                Kelola dan tindak lanjuti aduan yang ditangani Divisi Operasional.
+            </p>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            <!-- INFO DIVISI -->
-            <div class="mb-6 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-5">
+    <div class="py-8 sm:py-10 lg:py-12">
+
+        <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
+
+
+            {{-- ==========================================================
+                 INFO DIVISI
+            =========================================================== --}}
+
+            <div class="rounded-2xl border border-indigo-500/30 bg-indigo-950/20 p-5 sm:p-6">
 
                 <div class="flex items-start gap-4">
 
-                    <div class="p-3 bg-indigo-100 dark:bg-indigo-900/40 rounded-full text-xl">
+                    <div
+                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-500/15 text-xl"
+                    >
                         ⚙️
                     </div>
 
-                    <div>
+                    <div class="min-w-0">
 
-                        <h3 class="font-bold text-indigo-900 dark:text-indigo-300">
+                        <h3 class="font-semibold text-indigo-300">
                             Ruang Kerja Operasional
                         </h3>
 
-                        <p class="text-sm text-indigo-700 dark:text-indigo-400 mt-1">
-                            Halaman ini hanya menampilkan aduan yang telah
-                            didisposisikan ke Divisi Operasional.
+                        <p class="mt-1 text-sm leading-6 text-indigo-200/70">
+                            Menampilkan aduan yang telah didisposisikan
+                            ke Divisi Operasional untuk ditindaklanjuti.
                         </p>
 
                     </div>
@@ -43,19 +50,27 @@
             </div>
 
 
-            <!-- SEARCH & FILTER -->
-            <div class="mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+            {{-- ==========================================================
+                 SEARCH & FILTER
+            =========================================================== --}}
+
+            <div class="rounded-2xl border border-slate-700/80 bg-slate-800/90 p-4 sm:p-5 shadow-sm">
 
                 <form
                     method="GET"
-                    action="{{ route('complaints.index') }}"
-                    class="flex flex-col sm:flex-row gap-4"
+                    action="{{ route('manager.operasional.aduan') }}"
+                    class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_220px_auto]"
                 >
 
-                    <div class="flex-1">
+                    {{-- SEARCH --}}
 
-                        <label for="search" class="sr-only">
-                            Cari Tiket
+                    <div>
+
+                        <label
+                            for="search"
+                            class="mb-2 block text-sm font-medium text-slate-300"
+                        >
+                            Cari Aduan
                         </label>
 
                         <input
@@ -63,19 +78,28 @@
                             name="search"
                             id="search"
                             value="{{ request('search') }}"
-                            placeholder="Cari No. Tiket atau Judul Laporan..."
-                            class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            placeholder="Cari tiket, judul laporan, atau nama pelapor..."
+                            class="w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-sm text-slate-200 placeholder-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                         >
 
                     </div>
 
 
-                    <div class="sm:w-52">
+                    {{-- STATUS --}}
+
+                    <div>
+
+                        <label
+                            for="status"
+                            class="mb-2 block text-sm font-medium text-slate-300"
+                        >
+                            Status
+                        </label>
 
                         <select
                             name="status"
                             id="status"
-                            class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            class="w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-sm text-slate-200 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                         >
 
                             <option value="">
@@ -86,14 +110,21 @@
                                 value="diproses"
                                 {{ request('status') === 'diproses' ? 'selected' : '' }}
                             >
-                                Diproses
+                                Sedang Ditangani
                             </option>
 
                             <option
                                 value="menunggu_validasi_cc"
                                 {{ request('status') === 'menunggu_validasi_cc' ? 'selected' : '' }}
                             >
-                                Menunggu Validasi CC
+                                Menunggu Validasi
+                            </option>
+
+                            <option
+                                value="selesai"
+                                {{ request('status') === 'selesai' ? 'selected' : '' }}
+                            >
+                                Selesai
                             </option>
 
                         </select>
@@ -101,20 +132,23 @@
                     </div>
 
 
-                    <div class="flex gap-2">
+                    {{-- BUTTONS --}}
+
+                    <div class="flex items-end gap-2">
 
                         <button
                             type="submit"
-                            class="w-full sm:w-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-md shadow-sm transition"
+                            class="w-full rounded-xl bg-[#C8102E] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#C8102E]/20 transition hover:bg-[#A80D26] focus:outline-none focus:ring-2 focus:ring-[#C8102E]/40"
                         >
                             Terapkan
                         </button>
 
+
                         @if(request('search') || request('status'))
 
                             <a
-                                href="{{ route('complaints.index') }}"
-                                class="w-full sm:w-auto px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 text-sm font-semibold rounded-md shadow-sm transition text-center"
+                                href="{{ route('manager.operasional.aduan') }}"
+                                class="rounded-xl border border-slate-600 px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-slate-700 hover:text-white"
                             >
                                 Reset
                             </a>
@@ -128,38 +162,59 @@
             </div>
 
 
-            <!-- TABLE -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+            {{-- ==========================================================
+                 TABLE
+            =========================================================== --}}
 
-                <div class="p-0 sm:p-6 text-gray-900 dark:text-gray-100 overflow-x-auto">
+            <div class="overflow-hidden rounded-2xl border border-slate-700/80 bg-slate-800/90 shadow-sm">
 
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
 
-                        <thead class="bg-gray-50 dark:bg-gray-700/50">
+                {{-- TABLE HEADER --}}
+
+                <div class="border-b border-slate-700/80 px-5 py-5 sm:px-6">
+
+                    <h3 class="text-lg sm:text-xl font-bold text-white">
+                        Daftar Aduan Operasional
+                    </h3>
+
+                    <p class="mt-1 text-sm text-slate-400">
+                        Aduan yang sedang ditangani oleh Divisi Operasional.
+                    </p>
+
+                </div>
+
+
+                {{-- TABLE WRAPPER --}}
+
+                <div class="overflow-x-auto">
+
+                    <table class="min-w-[900px] w-full">
+
+                        <thead class="bg-slate-900/70">
 
                             <tr>
 
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     No. Tiket
                                 </th>
 
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     Pelapor
                                 </th>
 
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     Kategori
                                 </th>
 
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     Judul Laporan
                                 </th>
 
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th class="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     Status
                                 </th>
 
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                <th class="px-5 py-4 text-center text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     Aksi
                                 </th>
 
@@ -168,61 +223,101 @@
                         </thead>
 
 
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <tbody class="divide-y divide-slate-700/70">
 
                             @forelse($complaints as $complaint)
 
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                                <tr class="transition hover:bg-slate-700/25">
 
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        {{ $complaint->ticket_number }}
+
+                                    {{-- TICKET --}}
+
+                                    <td class="whitespace-nowrap px-5 py-5">
+
+                                        <span class="font-semibold text-indigo-400">
+                                            {{ $complaint->ticket_number }}
+                                        </span>
+
                                     </td>
 
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+
+                                    {{-- USER --}}
+
+                                    <td class="whitespace-nowrap px-5 py-5 text-sm text-slate-300">
                                         {{ $complaint->user->name }}
                                     </td>
 
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+
+                                    {{-- CATEGORY --}}
+
+                                    <td class="whitespace-nowrap px-5 py-5 text-sm text-slate-400">
                                         {{ $complaint->category->name }}
                                     </td>
 
+
+                                    {{-- TITLE --}}
+
                                     <td
-                                        class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 max-w-xs truncate"
+                                        class="max-w-xs px-5 py-5 text-sm text-slate-200"
                                         title="{{ $complaint->title }}"
                                     >
-                                        {{ $complaint->title }}
+
+                                        <div class="truncate">
+                                            {{ $complaint->title }}
+                                        </div>
+
                                     </td>
 
-                                    <td class="px-6 py-4 whitespace-nowrap">
+
+                                    {{-- STATUS --}}
+
+                                    <td class="whitespace-nowrap px-5 py-5">
 
                                         @if($complaint->status === 'diproses')
 
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
-                                                Diproses
+                                            <span class="inline-flex items-center rounded-full bg-blue-500/15 px-3 py-1 text-xs font-semibold text-blue-400">
+                                                Sedang Ditangani
+                                            </span>
+
+                                        @elseif($complaint->status === 'menunggu_validasi_cc')
+
+                                            <span class="inline-flex items-center rounded-full bg-purple-500/15 px-3 py-1 text-xs font-semibold text-purple-400">
+                                                Menunggu Validasi
+                                            </span>
+
+                                        @elseif($complaint->status === 'selesai')
+
+                                            <span class="inline-flex items-center rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-400">
+                                                Selesai
                                             </span>
 
                                         @else
 
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400">
-                                                Menunggu Validasi CC
+                                            <span class="inline-flex items-center rounded-full bg-slate-500/15 px-3 py-1 text-xs font-semibold text-slate-400">
+                                                {{ ucfirst(str_replace('_', ' ', $complaint->status)) }}
                                             </span>
 
                                         @endif
 
                                     </td>
 
-                                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+
+                                    {{-- ACTION --}}
+
+                                    <td class="whitespace-nowrap px-5 py-5 text-center">
 
                                         <a
                                             href="{{ route('complaints.show', $complaint->id) }}"
-                                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-semibold transition"
+                                            class="inline-flex items-center gap-2 rounded-xl border border-slate-600 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-indigo-400/50 hover:bg-indigo-500/10 hover:text-indigo-300"
                                         >
-                                            Lihat Detail →
+                                            Lihat Detail
+                                            <span>→</span>
                                         </a>
 
                                     </td>
 
                                 </tr>
+
 
                             @empty
 
@@ -230,18 +325,18 @@
 
                                     <td
                                         colspan="6"
-                                        class="px-6 py-12 text-center"
+                                        class="px-6 py-16 text-center"
                                     >
 
-                                        <div class="text-4xl mb-3">
+                                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-700/50 text-2xl">
                                             📭
                                         </div>
 
-                                        <p class="font-semibold text-gray-700 dark:text-gray-300">
+                                        <p class="mt-4 font-semibold text-slate-200">
                                             Tidak ada aduan operasional
                                         </p>
 
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                                        <p class="mt-1 text-sm text-slate-500">
                                             Belum ada aduan yang perlu ditangani.
                                         </p>
 
@@ -258,9 +353,11 @@
                 </div>
 
 
+                {{-- PAGINATION --}}
+
                 @if($complaints->hasPages())
 
-                    <div class="bg-gray-50 dark:bg-gray-700/30 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                    <div class="border-t border-slate-700/80 bg-slate-900/30 px-5 py-4 sm:px-6">
                         {{ $complaints->links() }}
                     </div>
 
@@ -269,5 +366,7 @@
             </div>
 
         </div>
+
     </div>
+
 </x-app-layout>

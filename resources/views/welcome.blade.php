@@ -58,11 +58,7 @@
 
                     <div class="hidden sm:block">
                         <div class="text-sm font-semibold text-slate-900 dark:text-white">
-                            Trans Semarang
-                        </div>
-
-                        <div class="text-xs text-slate-500 dark:text-slate-400">
-                            Sistem Aduan
+                            TRANS SEMARANG
                         </div>
                     </div>
                 </div>

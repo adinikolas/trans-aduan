@@ -1367,6 +1367,63 @@ class ComplaintController extends Controller
             );
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | REKAP ULASAN PENGGUNA - INTERNAL
+    |--------------------------------------------------------------------------
+    */
+
+    public function indexFeedback(Request $request)
+    {
+        $user = Auth::user();
+
+        // Hanya CC Room dan Manager yang boleh melihat rekap ulasan.
+        if (!in_array($user->role, [
+            'cc_room',
+            'manager_keuangan',
+            'manager_operasional',
+        ], true)) {
+            abort(403, 'Anda tidak memiliki akses ke rekap ulasan.');
+        }
+
+        $query = Complaint::with([
+            'user',
+            'category',
+            'division',
+            'feedback',
+        ])->whereHas('feedback');
+
+        // Manager hanya melihat ulasan dari divisinya sendiri.
+        if (in_array($user->role, [
+            'manager_keuangan',
+            'manager_operasional',
+        ], true)) {
+            $query->where('division_id', $user->division_id);
+        }
+
+        // Pencarian berdasarkan nomor tiket, judul aduan, atau nama pengguna.
+        $query->when($request->search, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('ticket_number', 'like', "%{$search}%")
+                    ->orWhere('title', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('feedback', function ($feedbackQuery) use ($search) {
+                        $feedbackQuery->where('comment', 'like', "%{$search}%");
+                    });
+            });
+        });
+
+        $complaints = $query
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('complaints.feedback_index', compact('complaints'));
+    }
+
     /*
     |--------------------------------------------------------------------------
     | HELPER MANAGER

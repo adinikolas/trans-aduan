@@ -67,6 +67,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/aduan/{id}/ulasan', [ComplaintController::class, 'storeFeedback'])
         ->name('complaints.store_feedback');
 
+    // Rekap Ulasan Pengguna - Internal
+    Route::get('/ulasan-pengguna', [ComplaintController::class, 'indexFeedback'])
+        ->name('feedback.index');
+
     // ========================================================
     // MANAGER KEUANGAN
     // ========================================================

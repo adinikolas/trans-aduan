@@ -1,8 +1,28 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Beri Ulasan untuk Tiket: ') }} {{ $complaint->ticket_number }}
-        </h2>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    {{ __('Beri Ulasan untuk Tiket: ') }} {{ $complaint->ticket_number }}
+                </h2>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Bagikan penilaian Anda terhadap penanganan aduan.
+                </p>
+            </div>
+
+            <a
+                href="{{ route('complaints.show', $complaint->id) }}"
+                class="inline-flex items-center justify-center gap-2 rounded-lg
+                    border border-gray-300 dark:border-gray-600
+                    px-4 py-2 text-sm font-semibold
+                    text-gray-700 dark:text-gray-200
+                    hover:bg-gray-100 dark:hover:bg-gray-700
+                    transition"
+            >
+                <span aria-hidden="true">←</span>
+                Kembali ke Detail Aduan
+            </a>
+        </div>
     </x-slot>
 
     <div class="py-12">
@@ -10,7 +30,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <h3 class="text-lg font-bold border-b dark:border-gray-700 pb-2 mb-4">Penilaian Layanan</h3>
-                    
+
                     <form action="{{ route('complaints.store_feedback', $complaint->id) }}" method="POST">
                         @csrf
 

@@ -32,13 +32,15 @@
 
                 <a
                     href="{{ route('manager.operasional') }}"
-                    class="inline-flex items-center justify-center px-4 py-2
-                           bg-gray-700 hover:bg-gray-600
-                           dark:bg-gray-700 dark:hover:bg-gray-600
-                           text-white text-sm font-semibold
-                           rounded-md shadow-sm transition"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg
+                        border border-gray-300 dark:border-gray-600
+                        px-4 py-2 text-sm font-semibold
+                        text-gray-700 dark:text-gray-200
+                        hover:bg-gray-100 dark:hover:bg-gray-700
+                        transition"
                 >
-                    ← Dashboard
+                    <span aria-hidden="true">←</span>
+                    Dashboard
                 </a>
 
             </div>

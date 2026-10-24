@@ -703,7 +703,7 @@
                                         Aduan ini telah diteruskan kepada
                                         <strong class="text-gray-900 dark:text-gray-200">
                                             Manager {{ $managerDivision }}
-                                        </strong>.
+                                        </strong>
 
                                     </p>
 

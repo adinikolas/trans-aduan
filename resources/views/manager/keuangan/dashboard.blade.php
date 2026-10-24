@@ -24,7 +24,7 @@
                     Dashboard Keuangan
                 </h1>
 
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p class="text-gray-500 dark:text-gray-400 mt-1">
                     Ringkasan data aduan dan penanganan bidang keuangan.
                 </p>
             </div>

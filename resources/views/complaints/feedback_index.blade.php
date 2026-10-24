@@ -2,10 +2,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <h2 class="text-xl font-semibold text-slate-800 dark:text-white">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 Ulasan Pengguna
             </h2>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Rekap penilaian dan masukan pengguna terhadap penyelesaian aduan.
             </p>
         </div>

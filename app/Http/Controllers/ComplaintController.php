@@ -173,46 +173,7 @@ class ComplaintController extends Controller
         |--------------------------------------------------------------------------
         */
         if ($user->role === 'manager_keuangan') {
-            $complaints = Complaint::with([
-                'user',
-                'category',
-                'division',
-            ])
-                ->where(
-                    'division_id',
-                    $user->division_id
-                )
-                ->whereIn(
-                    'status',
-                    [
-                        'diproses',
-                        'menunggu_validasi_cc',
-                    ]
-                )
-                ->when($request->search, function ($query, $search) {
-                    $query->where(function ($q) use ($search) {
-                        $q->where(
-                            'ticket_number',
-                            'like',
-                            "%{$search}%"
-                        )->orWhere(
-                            'title',
-                            'like',
-                            "%{$search}%"
-                        );
-                    });
-                })
-                ->when($request->status, function ($query, $status) {
-                    $query->where('status', $status);
-                })
-                ->latest()
-                ->paginate(10)
-                ->withQueryString();
-
-            return view(
-                'complaints.index_manager_keuangan',
-                compact('complaints')
-            );
+            return redirect()->route('manager.keuangan.aduan');
         }
 
         /*
@@ -221,46 +182,7 @@ class ComplaintController extends Controller
         |--------------------------------------------------------------------------
         */
         if ($user->role === 'manager_operasional') {
-            $complaints = Complaint::with([
-                'user',
-                'category',
-                'division',
-            ])
-                ->where(
-                    'division_id',
-                    $user->division_id
-                )
-                ->whereIn(
-                    'status',
-                    [
-                        'diproses',
-                        'menunggu_validasi_cc',
-                    ]
-                )
-                ->when($request->search, function ($query, $search) {
-                    $query->where(function ($q) use ($search) {
-                        $q->where(
-                            'ticket_number',
-                            'like',
-                            "%{$search}%"
-                        )->orWhere(
-                            'title',
-                            'like',
-                            "%{$search}%"
-                        );
-                    });
-                })
-                ->when($request->status, function ($query, $status) {
-                    $query->where('status', $status);
-                })
-                ->latest()
-                ->paginate(10)
-                ->withQueryString();
-
-            return view(
-                'complaints.index_manager_operasional',
-                compact('complaints')
-            );
+            return redirect()->route('manager.operasional.aduan');
         }
 
         abort(403, 'Akses tidak diizinkan.');
@@ -393,59 +315,6 @@ class ComplaintController extends Controller
                 'diproses',
                 'selesai'
             )
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | DAFTAR ADUAN MANAGER
-    |--------------------------------------------------------------------------
-    */
-
-    private function indexManager(
-        Request $request,
-        $user,
-        string $manager
-    ) {
-        $complaints = Complaint::with([
-            'user',
-            'category',
-            'division',
-        ])
-            ->where(
-                'division_id',
-                $user->division_id
-            )
-            ->whereIn(
-                'status',
-                [
-                    'diproses',
-                    'menunggu_validasi_cc',
-                ]
-            )
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where(
-                        'ticket_number',
-                        'like',
-                        "%{$search}%"
-                    )->orWhere(
-                        'title',
-                        'like',
-                        "%{$search}%"
-                    );
-                });
-            })
-            ->when($request->status, function ($query, $status) {
-                $query->where('status', $status);
-            })
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
-        return view(
-            "complaints.index_manager_{$manager}",
-            compact('complaints')
         );
     }
 

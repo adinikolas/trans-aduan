@@ -57,7 +57,7 @@
                                 : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
                             }}"
                         >
-                            Aduan Saya
+                            Daftar Aduan
                         </a>
 
                     {{-- MANAGER KEUANGAN --}}
@@ -81,7 +81,7 @@
                                 : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
                             }}"
                         >
-                            Aduan Saya
+                            Daftar Aduan
                         </a>
 
                     {{-- CC ROOM --}}
@@ -268,7 +268,7 @@
                         : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
                     }}"
                 >
-                    Aduan Saya
+                    Daftar Aduan
                 </a>
 
             {{-- MENU MANAGER KEUANGAN --}}
@@ -294,7 +294,7 @@
                         : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
                     }}"
                 >
-                    Aduan Saya
+                    Daftar Aduan
                 </a>
 
             {{-- MENU CC ROOM --}}

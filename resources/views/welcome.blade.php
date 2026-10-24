@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,10 +13,7 @@
         const savedTheme = localStorage.getItem('theme');
         const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-        if (
-            savedTheme === 'dark' ||
-            (!savedTheme && systemDark)
-        ) {
+        if (savedTheme === 'dark' || (!savedTheme && systemDark)) {
             document.documentElement.classList.add('dark');
         }
     </script>
@@ -33,11 +32,7 @@
 </head>
 
 <body
-    x-data="{
-        open: false,
-        loginModal: false
-    }"
-    @keydown.escape.window="loginModal = false"
+    x-data="{ open: false }"
     class="bg-slate-100 text-slate-900 antialiased transition-colors duration-300 dark:bg-slate-950 dark:text-white"
 >
 
@@ -91,13 +86,12 @@
                     <x-theme-toggle />
 
                     {{-- LOGIN --}}
-                    <button
-                        type="button"
-                        @click="loginModal = true"
+                    <a
+                        href="{{ route('login') }}"
                         class="rounded-lg bg-[#C8102E] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#C8102E]/20 transition duration-200 hover:bg-[#A50D25] hover:shadow-[#C8102E]/40 active:scale-95"
                     >
                         Masuk Sistem
-                    </button>
+                    </a>
                 </div>
 
                 {{-- MOBILE MENU BUTTON --}}
@@ -106,6 +100,7 @@
                     @click="open = !open"
                     class="inline-flex items-center justify-center rounded-lg p-2 text-slate-600 transition duration-200 hover:bg-[#C8102E]/10 hover:text-[#C8102E] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white md:hidden"
                     aria-label="Toggle navigation"
+                    :aria-expanded="open.toString()"
                 >
                     {{-- HAMBURGER --}}
                     <svg
@@ -188,18 +183,17 @@
                     </div>
 
                     {{-- MOBILE LOGIN --}}
-                    <button
-                        type="button"
-                        @click="open = false; loginModal = true"
+                    <a
+                        href="{{ route('login') }}"
+                        @click="open = false"
                         class="mt-2 rounded-lg bg-[#C8102E] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#C8102E]/20 transition duration-200 hover:bg-[#A50D25] hover:shadow-[#C8102E]/40 active:scale-95"
                     >
                         Masuk Sistem
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>
     </nav>
-
 
     {{-- =========================================================
          HERO
@@ -260,14 +254,13 @@
                         class="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center"
                     >
 
-                        {{-- LOGIN --}}
-                        <button
-                            type="button"
-                            @click="loginModal = true"
-                            class="rounded-xl bg-[#C8102E] px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#C8102E]/20 transition duration-200 hover:bg-[#A50D25] hover:shadow-[#C8102E]/40 active:scale-95"
+                        {{-- LOGIN PENGGUNA --}}
+                        <a
+                            href="{{ route('login') }}"
+                            class="rounded-xl bg-[#C8102E] px-7 py-3.5 text-center text-sm font-semibold text-white shadow-lg shadow-[#C8102E]/20 transition duration-200 hover:bg-[#A50D25] hover:shadow-[#C8102E]/40 active:scale-95"
                         >
                             Masuk ke Sistem
-                        </button>
+                        </a>
 
                         {{-- ALUR --}}
                         <a
@@ -280,7 +273,6 @@
                 </div>
             </div>
         </section>
-
 
         {{-- =====================================================
              TENTANG
@@ -380,7 +372,6 @@
             </div>
         </section>
 
-
         {{-- =====================================================
              ALUR
         ====================================================== --}}
@@ -479,7 +470,6 @@
         </section>
     </main>
 
-
     {{-- =========================================================
          FOOTER
     ========================================================== --}}
@@ -508,120 +498,6 @@
             </div>
         </div>
     </footer>
-
-
-    {{-- =========================================================
-         LOGIN MODAL
-    ========================================================== --}}
-    <div
-        x-show="loginModal"
-        x-cloak
-        x-transition.opacity
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm"
-    >
-        {{-- MODAL BOX --}}
-        <div
-            x-show="loginModal"
-            x-transition
-            @click.outside="loginModal = false"
-            class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:p-8"
-        >
-
-            {{-- HEADER --}}
-            <div class="text-center">
-
-                <div
-                    class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#C8102E]/10 text-2xl"
-                >
-                    🔐
-                </div>
-
-                <h2
-                    class="mt-5 text-xl font-bold text-slate-900 dark:text-white"
-                >
-                    Masuk ke Sistem
-                </h2>
-
-                <p
-                    class="mt-2 text-sm text-slate-600 dark:text-slate-400"
-                >
-                    Pilih jenis akun yang ingin digunakan.
-                </p>
-            </div>
-
-
-            {{-- OPTIONS --}}
-            <div class="mt-7 space-y-3">
-
-                {{-- PENGGUNA --}}
-                <a
-                    href="{{ route('login') }}"
-                    class="group flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 transition duration-200 hover:border-[#C8102E]/50 hover:bg-[#C8102E]/10 hover:shadow-lg hover:shadow-[#C8102E]/10 active:scale-[0.98] dark:border-slate-700 dark:bg-slate-800/50"
-                >
-                    <div
-                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#C8102E]/10 text-xl transition duration-200 group-hover:bg-[#C8102E]/20"
-                    >
-                        👤
-                    </div>
-
-                    <div class="min-w-0 flex-1">
-                        <div class="font-semibold text-slate-900 dark:text-white">
-                            Pengguna
-                        </div>
-
-                        <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                            Buat dan pantau aduan Anda.
-                        </div>
-                    </div>
-
-                    <div
-                        class="text-slate-400 transition duration-200 group-hover:translate-x-1 group-hover:text-[#C8102E]"
-                    >
-                        →
-                    </div>
-                </a>
-
-
-                {{-- INTERNAL --}}
-                <a
-                    href="{{ route('internal.login') }}"
-                    class="group flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 transition duration-200 hover:border-[#C8102E]/50 hover:bg-[#C8102E]/10 hover:shadow-lg hover:shadow-[#C8102E]/10 active:scale-[0.98] dark:border-slate-700 dark:bg-slate-800/50"
-                >
-                    <div
-                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#C8102E]/10 text-xl transition duration-200 group-hover:bg-[#C8102E]/20"
-                    >
-                        🏢
-                    </div>
-
-                    <div class="min-w-0 flex-1">
-                        <div class="font-semibold text-slate-900 dark:text-white">
-                            Login Internal
-                        </div>
-
-                        <div class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                            Untuk CC Room dan Manager.
-                        </div>
-                    </div>
-
-                    <div
-                        class="text-slate-400 transition duration-200 group-hover:translate-x-1 group-hover:text-[#C8102E]"
-                    >
-                        →
-                    </div>
-                </a>
-            </div>
-
-
-            {{-- CANCEL --}}
-            <button
-                type="button"
-                @click="loginModal = false"
-                class="mt-6 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-600 transition duration-200 hover:border-slate-400 hover:bg-slate-100 hover:text-slate-900 active:scale-[0.98] dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white"
-            >
-                Batal
-            </button>
-        </div>
-    </div>
 
 </body>
 </html>

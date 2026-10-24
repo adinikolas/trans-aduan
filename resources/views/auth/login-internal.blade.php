@@ -207,7 +207,7 @@
 
                 </div>
 
-                {{-- PUBLIC LOGIN --}}
+                {{-- PUBLIC LOGIN
                 <div class="mt-6 text-center">
 
                     <p class="text-sm text-slate-500 dark:text-slate-400">
@@ -221,9 +221,9 @@
                         Login Pengguna Umum →
                     </a>
 
-                </div>
+                </div> --}}
 
-                {{-- BACK HOME --}}
+                {{-- BACK HOME
                 <div class="mt-5 text-center">
 
                     <a
@@ -233,7 +233,7 @@
                         ← Kembali ke halaman utama
                     </a>
 
-                </div>
+                </div> --}}
 
             </div>
 

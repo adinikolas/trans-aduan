@@ -191,7 +191,7 @@
 
                 </div>
 
-                {{-- INTERNAL LOGIN --}}
+                {{-- INTERNAL LOGIN
                 <div class="mt-6 border-t border-slate-200 pt-6 text-center dark:border-slate-800">
 
                     <p class="text-sm text-slate-500 dark:text-slate-400">
@@ -205,7 +205,7 @@
                         Login Internal →
                     </a>
 
-                </div>
+                </div> --}}
 
                 {{-- BACK HOME --}}
                 <div class="mt-5 text-center">

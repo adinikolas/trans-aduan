@@ -2,11 +2,11 @@
     <x-slot name="header">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h2 class="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                     Riwayat Laporan Saya
                 </h2>
 
-                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     Pantau perkembangan aduan yang telah Anda kirim.
                 </p>
             </div>

@@ -4,11 +4,11 @@
         <div class="flex items-center justify-between gap-4">
 
             <div>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                     Tindak Lanjut Aduan
                 </h2>
 
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     {{ $complaint->ticket_number }}
                 </p>
             </div>

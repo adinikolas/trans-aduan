@@ -21,11 +21,6 @@ class AuthenticatedSessionController extends Controller
 
     /**
      * Display the internal login page.
-     *
-     * Internal users:
-     * - CC Room
-     * - Manager Keuangan
-     * - Manager Operasional
      */
     public function createInternal(): View
     {
@@ -37,24 +32,16 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate([
-            'pengguna',
-        ]);
-
+        $request->authenticate(['pengguna']);
         $request->session()->regenerate();
 
         return redirect()->intended(
             route('dashboard', absolute: false)
-        );
+        )->withCookie(cookie()->forget('login_type'));
     }
 
     /**
      * Handle login for internal users.
-     *
-     * Allowed roles:
-     * - CC Room
-     * - Manager Keuangan
-     * - Manager Operasional
      */
     public function storeInternal(LoginRequest $request): RedirectResponse
     {
@@ -68,7 +55,7 @@ class AuthenticatedSessionController extends Controller
 
         return redirect()->intended(
             route('dashboard', absolute: false)
-        );
+        )->withCookie(cookie('login_type', 'internal', 43200));
     }
 
     /**
@@ -76,12 +63,17 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $isInternal = $request->cookie('login_type') === 'internal';
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        $response = redirect(
+            $isInternal ? route('internal.login') : route('login')
+        );
+
+        return $response->withCookie(cookie()->forget('login_type'));
     }
 }

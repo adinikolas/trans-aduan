@@ -600,41 +600,33 @@ class ComplaintController extends Controller
             abort(403, 'Akses tidak diizinkan.');
         }
 
+        // Ambil seluruh aduan dari divisi manager.
+        // Tidak ada filter status agar aduan selesai dan ditolak ikut tampil.
         $complaints = Complaint::with([
             'user',
             'category',
             'division',
         ])
-            ->where(
-                'division_id',
-                $user->division_id
-            )
-            ->whereIn(
-                'status',
-                [
-                    'diproses',
-                    'menunggu_validasi_cc',
-                ]
-            )
+            ->where('division_id', $user->division_id)
+
+            // Pencarian berdasarkan nomor tiket, nama pelapor, dan jenis aduan.
             ->when($request->search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where(
-                        'ticket_number',
-                        'like',
-                        "%{$search}%"
-                    )->orWhere(
-                        'title',
-                        'like',
-                        "%{$search}%"
-                    );
+                    $q->where('ticket_number', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('category', function ($categoryQuery) use ($search) {
+                            $categoryQuery->where('name', 'like', "%{$search}%");
+                        });
                 });
             })
+
+            // Filter status tetap tersedia jika dipilih.
             ->when($request->status, function ($query, $status) {
-                $query->where(
-                    'status',
-                    $status
-                );
+                $query->where('status', $status);
             })
+
             ->latest()
             ->paginate(10)
             ->withQueryString();

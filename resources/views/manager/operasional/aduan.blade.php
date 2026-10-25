@@ -95,36 +95,13 @@
                             Status
                         </label>
 
-                        <select
-                            name="status"
-                            id="status"
-                            class="block w-full rounded-md
-                                   border-gray-300 dark:border-gray-700
-                                   dark:bg-gray-900 dark:text-gray-300
-                                   shadow-sm
-                                   focus:border-indigo-500
-                                   focus:ring-indigo-500
-                                   sm:text-sm"
-                        >
-
-                            <option value="">
-                                Semua Status
-                            </option>
-
-                            <option
-                                value="diproses"
-                                {{ request('status') === 'diproses' ? 'selected' : '' }}
-                            >
-                                Diproses
-                            </option>
-
-                            <option
-                                value="menunggu_validasi_cc"
-                                {{ request('status') === 'menunggu_validasi_cc' ? 'selected' : '' }}
-                            >
-                                Menunggu Validasi CC
-                            </option>
-
+                        <select name="status" id="status"
+                            class="block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                            <option value="">Semua Status</option>
+                            <option value="diproses" {{ request('status') === 'diproses' ? 'selected' : '' }}>Diproses</option>
+                            <option value="menunggu_validasi_cc" {{ request('status') === 'menunggu_validasi_cc' ? 'selected' : '' }}>Menunggu Validasi CC</option>
+                            <option value="selesai" {{ request('status') === 'selesai' ? 'selected' : '' }}>Selesai</option>
+                            <option value="ditolak" {{ request('status') === 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                         </select>
 
                     </div>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ComplaintController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -70,6 +71,31 @@ Route::middleware('auth')->group(function () {
     // Rekap Ulasan Pengguna - Internal
     Route::get('/ulasan-pengguna', [ComplaintController::class, 'indexFeedback'])
         ->name('feedback.index');
+
+    // ========================================================
+    // BERITA - CC ROOM
+    // ========================================================
+
+    Route::prefix('cc-room/berita')->name('news.')->group(function () {
+
+        Route::get('/', [NewsController::class, 'index'])
+            ->name('index');
+
+        Route::get('/buat', [NewsController::class, 'create'])
+            ->name('create');
+
+        Route::post('/', [NewsController::class, 'store'])
+            ->name('store');
+
+        Route::get('/{news}/edit', [NewsController::class, 'edit'])
+            ->name('edit');
+
+        Route::put('/{news}', [NewsController::class, 'update'])
+            ->name('update');
+
+        Route::delete('/{news}', [NewsController::class, 'destroy'])
+            ->name('destroy');
+    });
 
     // ========================================================
     // MANAGER KEUANGAN

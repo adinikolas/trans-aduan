@@ -1,4 +1,3 @@
-
 <nav
     x-data="{ open: false }"
     class="relative z-50 border-b border-slate-200 bg-white/95 backdrop-blur transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900/95"
@@ -37,14 +36,13 @@
                 <div class="hidden h-16 sm:ms-10 sm:flex sm:items-center sm:gap-8">
 
                     {{-- MANAGER OPERASIONAL --}}
-                    @if($role === 'manager_operasional')
+                    @if ($role === 'manager_operasional')
                         <a
                             href="{{ route('manager.operasional') }}"
                             class="inline-flex h-16 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-200
                             {{ request()->routeIs('manager.operasional')
                                 ? 'border-[#C8102E] text-slate-900 dark:text-white'
-                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
-                            }}"
+                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200' }}"
                         >
                             Dashboard
                         </a>
@@ -54,21 +52,19 @@
                             class="inline-flex h-16 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-200
                             {{ request()->routeIs('manager.operasional.aduan')
                                 ? 'border-[#C8102E] text-slate-900 dark:text-white'
-                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
-                            }}"
+                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200' }}"
                         >
                             Daftar Aduan
                         </a>
 
                     {{-- MANAGER KEUANGAN --}}
-                    @elseif($role === 'manager_keuangan')
+                    @elseif ($role === 'manager_keuangan')
                         <a
                             href="{{ route('manager.keuangan') }}"
                             class="inline-flex h-16 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-200
                             {{ request()->routeIs('manager.keuangan')
                                 ? 'border-[#C8102E] text-slate-900 dark:text-white'
-                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
-                            }}"
+                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200' }}"
                         >
                             Dashboard
                         </a>
@@ -78,23 +74,31 @@
                             class="inline-flex h-16 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-200
                             {{ request()->routeIs('manager.keuangan.aduan')
                                 ? 'border-[#C8102E] text-slate-900 dark:text-white'
-                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
-                            }}"
+                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200' }}"
                         >
                             Daftar Aduan
                         </a>
 
                     {{-- CC ROOM --}}
-                    @elseif($role === 'cc_room')
+                    @elseif ($role === 'cc_room')
                         <a
                             href="{{ route('dashboard') }}"
                             class="inline-flex h-16 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-200
                             {{ request()->routeIs('dashboard')
                                 ? 'border-[#C8102E] text-slate-900 dark:text-white'
-                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
-                            }}"
+                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200' }}"
                         >
                             Dashboard
+                        </a>
+
+                        <a
+                            href="{{ route('news.index') }}"
+                            class="inline-flex h-16 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-200
+                            {{ request()->routeIs('news.*')
+                                ? 'border-[#C8102E] text-slate-900 dark:text-white'
+                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200' }}"
+                        >
+                            Kelola Berita
                         </a>
 
                     {{-- PENGGUNA --}}
@@ -104,22 +108,20 @@
                             class="inline-flex h-16 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-200
                             {{ request()->routeIs('complaints.index')
                                 ? 'border-[#C8102E] text-slate-900 dark:text-white'
-                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
-                            }}"
+                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200' }}"
                         >
                             Aduan Saya
                         </a>
                     @endif
 
-                    {{-- MENU ULASAN PENGGUNA UNTUK INTERNAL --}}
-                    @if(in_array($role, $internalRoles, true))
+                    {{-- ULASAN PENGGUNA UNTUK INTERNAL --}}
+                    @if (in_array($role, $internalRoles, true))
                         <a
                             href="{{ route('feedback.index') }}"
                             class="inline-flex h-16 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-200
                             {{ request()->routeIs('feedback.index')
                                 ? 'border-[#C8102E] text-slate-900 dark:text-white'
-                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
-                            }}"
+                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200' }}"
                         >
                             Ulasan Pengguna
                         </a>
@@ -186,6 +188,7 @@
                     @click="open = !open"
                     class="inline-flex items-center justify-center rounded-xl p-2 text-slate-700 transition duration-200 hover:bg-slate-100 hover:text-slate-900 focus:outline-none dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                     aria-label="Toggle navigation"
+                    :aria-expanded="open.toString()"
                 >
                     {{-- IKON HAMBURGER --}}
                     <svg
@@ -246,15 +249,14 @@
             </div>
 
             {{-- MENU MANAGER OPERASIONAL --}}
-            @if($role === 'manager_operasional')
+            @if ($role === 'manager_operasional')
                 <a
                     href="{{ route('manager.operasional') }}"
                     @click="open = false"
                     class="block rounded-xl px-4 py-3 text-sm font-medium transition
                     {{ request()->routeIs('manager.operasional')
                         ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
-                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
-                    }}"
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
                 >
                     Dashboard
                 </a>
@@ -265,22 +267,20 @@
                     class="block rounded-xl px-4 py-3 text-sm font-medium transition
                     {{ request()->routeIs('manager.operasional.aduan')
                         ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
-                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
-                    }}"
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
                 >
                     Daftar Aduan
                 </a>
 
             {{-- MENU MANAGER KEUANGAN --}}
-            @elseif($role === 'manager_keuangan')
+            @elseif ($role === 'manager_keuangan')
                 <a
                     href="{{ route('manager.keuangan') }}"
                     @click="open = false"
                     class="block rounded-xl px-4 py-3 text-sm font-medium transition
                     {{ request()->routeIs('manager.keuangan')
                         ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
-                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
-                    }}"
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
                 >
                     Dashboard
                 </a>
@@ -291,24 +291,33 @@
                     class="block rounded-xl px-4 py-3 text-sm font-medium transition
                     {{ request()->routeIs('manager.keuangan.aduan')
                         ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
-                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
-                    }}"
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
                 >
                     Daftar Aduan
                 </a>
 
             {{-- MENU CC ROOM --}}
-            @elseif($role === 'cc_room')
+            @elseif ($role === 'cc_room')
                 <a
                     href="{{ route('dashboard') }}"
                     @click="open = false"
                     class="block rounded-xl px-4 py-3 text-sm font-medium transition
                     {{ request()->routeIs('dashboard')
                         ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
-                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
-                    }}"
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
                 >
                     Dashboard
+                </a>
+
+                <a
+                    href="{{ route('news.index') }}"
+                    @click="open = false"
+                    class="block rounded-xl px-4 py-3 text-sm font-medium transition
+                    {{ request()->routeIs('news.*')
+                        ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
+                >
+                    Kelola Berita
                 </a>
 
             {{-- MENU PENGGUNA --}}
@@ -319,23 +328,21 @@
                     class="block rounded-xl px-4 py-3 text-sm font-medium transition
                     {{ request()->routeIs('complaints.index')
                         ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
-                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
-                    }}"
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
                 >
                     Aduan Saya
                 </a>
             @endif
 
-            {{-- MENU ULASAN PENGGUNA UNTUK INTERNAL --}}
-            @if(in_array($role, $internalRoles, true))
+            {{-- ULASAN PENGGUNA UNTUK INTERNAL --}}
+            @if (in_array($role, $internalRoles, true))
                 <a
                     href="{{ route('feedback.index') }}"
                     @click="open = false"
                     class="block rounded-xl px-4 py-3 text-sm font-medium transition
                     {{ request()->routeIs('feedback.index')
                         ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
-                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
-                    }}"
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
                 >
                     Ulasan Pengguna
                 </a>

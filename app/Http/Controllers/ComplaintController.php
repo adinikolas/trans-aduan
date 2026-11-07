@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Complaint;
 use App\Models\ComplaintHistory;
 use App\Models\Feedback;
+use App\Models\News;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -50,6 +51,12 @@ class ComplaintController extends Controller
                 ->where('status', 'ditolak')
                 ->count();
 
+            $news = News::where('status', 'published')
+                ->whereNotNull('published_at')
+                ->orderByDesc('published_at')
+                ->take(3)
+                ->get();
+
             $complaints = (clone $baseQuery)
                 ->with([
                     'category',
@@ -84,7 +91,8 @@ class ComplaintController extends Controller
                     'menunggu',
                     'diproses',
                     'selesai',
-                    'ditolak'
+                    'ditolak',
+                    'news'
                 )
             );
         }

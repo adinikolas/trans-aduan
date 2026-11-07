@@ -30,6 +30,53 @@
                 </div>
             @endif
 
+            {{-- BERITA TERBARU --}}
+            @if ($news->isNotEmpty())
+                <div class="mb-8">
+                    <div class="mb-4">
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white">
+                            Berita Terbaru
+                        </h3>
+
+                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                            Informasi terbaru seputar layanan Trans Semarang.
+                        </p>
+                    </div>
+
+                    <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                        @foreach ($news as $item)
+                            <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
+                                @if ($item->image)
+                                    <img
+                                        src="{{ asset('storage/' . $item->image) }}"
+                                        alt="{{ $item->title }}"
+                                        class="aspect-video w-full object-cover"
+                                    >
+                                @else
+                                    <div class="flex aspect-video w-full items-center justify-center bg-slate-100 text-4xl dark:bg-slate-800">
+                                        📰
+                                    </div>
+                                @endif
+
+                                <div class="p-5">
+                                    <p class="text-xs font-medium text-[#C8102E]">
+                                        {{ \Carbon\Carbon::parse($item->published_at)->translatedFormat('d F Y') }}
+                                    </p>
+
+                                    <h4 class="mt-2 line-clamp-2 font-semibold text-slate-900 dark:text-white">
+                                        {{ $item->title }}
+                                    </h4>
+
+                                    <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                                        {{ \Illuminate\Support\Str::limit(strip_tags($item->content), 110) }}
+                                    </p>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
             {{-- STATISTICS --}}
             <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 

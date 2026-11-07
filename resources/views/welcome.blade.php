@@ -467,6 +467,64 @@
                 </div>
             </div>
         </section>
+
+        {{-- =====================================================
+            BERITA TERBARU
+        ====================================================== --}}
+        @if ($news->isNotEmpty())
+            <section
+                id="berita"
+                class="border-t border-slate-200 bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/50"
+            >
+                <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                    <div class="mx-auto max-w-2xl text-center">
+                        <span class="text-sm font-semibold uppercase tracking-wider text-[#C8102E]">
+                            Informasi Terbaru
+                        </span>
+
+                        <h2 class="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">
+                            Berita Trans Semarang
+                        </h2>
+
+                        <p class="mt-4 text-sm leading-6 text-slate-600 sm:text-base dark:text-slate-400">
+                            Informasi dan kabar terbaru seputar layanan Trans Semarang.
+                        </p>
+                    </div>
+
+                    <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        @foreach ($news as $item)
+                            <article class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900">
+                                @if ($item->image)
+                                    <img
+                                        src="{{ asset('storage/' . $item->image) }}"
+                                        alt="{{ $item->title }}"
+                                        class="aspect-video w-full object-cover"
+                                    >
+                                @else
+                                    <div class="flex aspect-video w-full items-center justify-center bg-slate-100 text-4xl dark:bg-slate-800">
+                                        📰
+                                    </div>
+                                @endif
+
+                                <div class="p-6">
+                                    <p class="text-xs font-medium text-[#C8102E]">
+                                        {{ \Carbon\Carbon::parse($item->published_at)->translatedFormat('d F Y') }}
+                                    </p>
+
+                                    <h3 class="mt-3 line-clamp-2 text-lg font-semibold text-slate-900 dark:text-white">
+                                        {{ $item->title }}
+                                    </h3>
+
+                                    <p class="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                                        {{ \Illuminate\Support\Str::limit(strip_tags($item->content), 130) }}
+                                    </p>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                </div>
+            </section>
+        @endif
     </main>
 
     {{-- =========================================================

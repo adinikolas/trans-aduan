@@ -209,6 +209,7 @@
                         'Tanggal',
                         'Jam',
                         'Pelapor',
+                        'Divisi Tujuan',
                         'Pengemudi',
                         'No Armada',
                         'TKP',

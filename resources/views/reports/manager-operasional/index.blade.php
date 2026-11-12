@@ -176,7 +176,7 @@
                 <div class="mt-4 flex flex-wrap gap-2">
 
                     @foreach ([
-                        'No', 'Tanggal', 'Jam', 'Pelapor',
+                        'No', 'Tanggal', 'Jam', 'Pelapor', 'Divisi Tujuan',
                         'Pengemudi', 'No Armada', 'TKP',
                         'Jenis Aduan', 'Isi Aduan',
                         'Keterangan', 'Status',

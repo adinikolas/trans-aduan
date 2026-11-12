@@ -91,104 +91,100 @@
 
                     {{-- TICKET --}}
                     <div>
-
                         <p class="text-xs font-medium uppercase tracking-wide
                                   text-gray-500 dark:text-gray-400">
                             Nomor Tiket
                         </p>
-
                         <p class="mt-1 font-semibold text-red-600 dark:text-red-400">
                             {{ $complaint->ticket_number }}
                         </p>
-
                     </div>
-
 
                     {{-- PELAPOR --}}
                     <div>
-
                         <p class="text-xs font-medium uppercase tracking-wide
                                   text-gray-500 dark:text-gray-400">
                             Pelapor
                         </p>
-
                         <p class="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                             {{ $complaint->user->name }}
                         </p>
-
                     </div>
-
 
                     {{-- KATEGORI --}}
                     <div>
-
                         <p class="text-xs font-medium uppercase tracking-wide
                                   text-gray-500 dark:text-gray-400">
                             Kategori
                         </p>
-
                         <p class="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                             {{ $complaint->category->name }}
                         </p>
-
                     </div>
-
 
                     {{-- DIVISI --}}
                     <div>
-
                         <p class="text-xs font-medium uppercase tracking-wide
                                   text-gray-500 dark:text-gray-400">
                             Divisi Penanganan
                         </p>
-
                         @if($complaint->division)
-
                             <span class="mt-1 inline-flex rounded-full
                                          bg-indigo-100 px-3 py-1 text-xs font-semibold
                                          text-indigo-700
                                          dark:bg-indigo-900/30 dark:text-indigo-400">
                                 {{ $complaint->division->name }}
                             </span>
-
                         @else
-
                             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                 Belum ditentukan
                             </p>
-
                         @endif
-
                     </div>
-
 
                     {{-- WAKTU --}}
                     <div>
-
                         <p class="text-xs font-medium uppercase tracking-wide
                                   text-gray-500 dark:text-gray-400">
                             Waktu Kejadian
                         </p>
-
                         <p class="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                             {{ \Carbon\Carbon::parse($complaint->incident_time)->format('d M Y, H:i') }}
                         </p>
-
                     </div>
 
+                    {{-- LOKASI KEJADIAN --}}
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide
+                                text-gray-500 dark:text-gray-400">
+                            Lokasi Kejadian
+                        </p>
+
+                        <p class="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                            {{ $complaint->location ?: '-' }}
+                        </p>
+                    </div>
+
+                    {{-- NAMA PENGEMUDI --}}
+                    <div>
+                        <p class="text-xs font-medium uppercase tracking-wide text-gray-400">
+                            Nama Pengemudi
+                        </p>
+
+                        <p class="mt-1 font-semibold text-gray-900 dark:text-gray-100">
+                            {{ $complaint->driver_name ?: '-' }}
+                        </p>
+                    </div>
 
                     {{-- BUS --}}
                     <div>
-
                         <p class="text-xs font-medium uppercase tracking-wide
                                   text-gray-500 dark:text-gray-400">
                             No. Lambung Bus
                         </p>
-
                         <p class="mt-1 font-semibold text-gray-900 dark:text-gray-100">
                             {{ $complaint->bus_number ?: '-' }}
                         </p>
-
                     </div>
 
                 </div>

@@ -256,6 +256,30 @@
                             </div>
 
 
+                            {{-- LOKASI KEJADIAN --}}
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-gray-400">
+                                    Lokasi Kejadian
+                                </p>
+
+                                <p class="mt-1 break-words text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                    {{ $complaint->location ?: '-' }}
+                                </p>
+                            </div>
+
+
+                            {{-- NAMA PENGEMUDI --}}
+                            <div>
+                                <p class="text-xs font-medium uppercase tracking-wide text-gray-400">
+                                    Nama Pengemudi
+                                </p>
+
+                                <p class="mt-1 break-words text-sm font-semibold text-gray-900 dark:text-gray-100">
+                                    {{ $complaint->driver_name ?: '-' }}
+                                </p>
+                            </div>
+
+
                             {{-- BUS --}}
                             <div>
 
@@ -529,6 +553,35 @@
 
                                     @csrf
                                     @method('PUT')
+
+                                    {{-- NAMA PENGEMUDI --}}
+                                    <div class="mb-4">
+                                        <label for="driver_name"
+                                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Nama Pengemudi
+                                            <span class="text-xs font-normal text-gray-400">(Opsional)</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            name="driver_name"
+                                            id="driver_name"
+                                            maxlength="255"
+                                            value="{{ old('driver_name', $complaint->driver_name) }}"
+                                            class="mt-1 block w-full rounded-lg border-gray-300
+                                                dark:border-gray-700 dark:bg-gray-950
+                                                dark:text-gray-300 shadow-sm
+                                                focus:border-indigo-500 focus:ring-indigo-500
+                                                sm:text-sm"
+                                            placeholder="Masukkan nama pengemudi jika diketahui"
+                                        >
+
+                                        @error('driver_name')
+                                            <span class="mt-1 block text-xs text-red-500">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+                                    </div>
 
                                     <button
                                         type="submit"

@@ -745,6 +745,7 @@ class ComplaintController extends Controller
             'title' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'incident_time' => 'required|date',
+            'location' => 'required|string|max:255',
             'bus_number' => 'nullable|string|max:50',
             'description' => 'required|string',
             'evidence' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -777,6 +778,7 @@ class ComplaintController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'incident_time' => $validated['incident_time'],
+            'location' => $validated['location'],
             'bus_number' => $validated['bus_number'] ?? null,
             'evidence_path' => $evidencePath,
             'status' => 'menunggu',
@@ -875,6 +877,7 @@ class ComplaintController extends Controller
 
         $validated = $request->validate([
             'status' => 'required|in:diproses,ditolak,selesai',
+            'driver_name' => 'nullable|string|max:255',
         ]);
 
         $oldStatus = $complaint->status;
@@ -900,6 +903,7 @@ class ComplaintController extends Controller
                 $complaint->update([
                     'status' => 'diproses',
                     'division_id' => $divisionId,
+                    'driver_name' => $validated['driver_name'] ?? null,
                 ]);
 
                 $divisionName = $complaint->category->division->name;
@@ -916,6 +920,7 @@ class ComplaintController extends Controller
 
                 $complaint->update([
                     'status' => 'ditolak',
+                    'driver_name' => $validated['driver_name'] ?? null,
                 ]);
 
                 $historyNote =
@@ -1100,21 +1105,25 @@ class ComplaintController extends Controller
 
         $validated = $request->validate([
             'resolution_notes' => 'required|string',
-            'resolution_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'resolution_proof' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ], [
             'resolution_proof.image' =>
                 'File bukti perbaikan harus berupa gambar.',
 
             'resolution_proof.max' =>
-                'Ukuran foto maksimal adalah 2MB.',
+                'Ukuran foto maksimal adalah 5MB.',
         ]);
 
-        $proofPath = $request
-            ->file('resolution_proof')
-            ->store(
-                'resolution_proofs',
-                'public'
-            );
+        $proofPath = $complaint->resolution_proof_path;
+
+        if ($request->hasFile('resolution_proof')) {
+            $proofPath = $request
+                ->file('resolution_proof')
+                ->store(
+                    'resolution_proofs',
+                    'public'
+                );
+        }
 
         $complaint->update([
             'status' => 'menunggu_validasi_cc',

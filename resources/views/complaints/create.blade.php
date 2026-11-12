@@ -71,6 +71,40 @@
                             </div>
                         </div>
 
+                        {{-- LOKASI KEJADIAN --}}
+                        <div class="mb-5">
+                            <label for="location"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Lokasi Kejadian
+                                <span class="text-red-500">*</span>
+                            </label>
+
+                            <input
+                                type="text"
+                                name="location"
+                                id="location"
+                                required
+                                maxlength="255"
+                                value="{{ old('location') }}"
+                                class="mt-1 block w-full rounded-md border-gray-300
+                                    dark:border-gray-700 dark:bg-gray-900
+                                    dark:text-gray-300 shadow-sm
+                                    focus:border-indigo-500 focus:ring-indigo-500
+                                    sm:text-sm transition duration-150"
+                                placeholder="Contoh: Halte Simpang Lima / Koridor 1 arah Mangkang"
+                            >
+
+                            @error('location')
+                                <span class="text-red-500 dark:text-red-400 text-xs mt-1 block">
+                                    {{ $message }}
+                                </span>
+                            @enderror
+
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                Masukkan nama halte, jalan, titik lokasi, atau tempat kejadian secara spesifik.
+                            </p>
+                        </div>
+
                         <div class="mb-5">
                             <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Detail Kejadian</label>
                             <textarea name="description" id="description" rows="4" required

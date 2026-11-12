@@ -15,6 +15,8 @@ class Complaint extends Model
         'description',
         'incident_time',
         'bus_number',
+        'location',
+        'driver_name',
         'evidence_path',
         'status',
         'resolution_notes',

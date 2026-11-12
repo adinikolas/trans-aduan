@@ -25,6 +25,7 @@ class ComplaintExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
         return $this->query;
     }
 
+
     public function headings(): array
     {
         return [
@@ -32,6 +33,7 @@ class ComplaintExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
             'Tanggal',
             'Jam',
             'Pelapor',
+            'Divisi Tujuan',
             'Pengemudi',
             'No Armada',
             'TKP',
@@ -46,18 +48,28 @@ class ComplaintExport implements FromQuery, WithHeadings, WithMapping, ShouldAut
     {
         $incidentTime = Carbon::parse($complaint->incident_time);
 
+        $statusLabel = match ($complaint->status) {
+            'menunggu' => 'Menunggu',
+            'diproses' => 'Diproses',
+            'menunggu_validasi_cc' => 'Menunggu Validasi CC',
+            'selesai' => 'Selesai',
+            'ditolak' => 'Ditolak',
+            default => $complaint->status,
+        };
+
         return [
             ++$this->rowNumber,
             $incidentTime->format('d/m/Y'),
             $incidentTime->format('H:i'),
             $complaint->user?->name ?? '-',
+            $complaint->division?->name ?? 'Belum Ditugaskan',
             $complaint->driver_name ?? '-',
             $complaint->bus_number ?? '-',
             $complaint->location ?? '-',
             $complaint->category?->name ?? '-',
             $complaint->description,
             $complaint->resolution_notes ?? '-',
-            $complaint->status,
+            $statusLabel,
         ];
     }
 }

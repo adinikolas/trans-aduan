@@ -8,6 +8,7 @@ use App\Models\Division;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
+use Carbon\Carbon;
 
 class ExportController extends Controller
 {
@@ -97,7 +98,59 @@ class ExportController extends Controller
 
         $query->orderBy('incident_time');
 
-        $filename = 'Laporan_Aduan_' . now()->format('Ymd_His') . '.xlsx';
+
+        $filenameParts = ['Laporan', 'Aduan'];
+
+        // Filter divisi (khusus CC Room)
+        if ($user->role === 'cc_room' && $request->filled('division_id')) {
+            $division = Division::find($request->division_id);
+
+            if ($division) {
+                $filenameParts[] = str_replace(
+                    ' ',
+                    '_',
+                    $division->name
+                );
+            }
+        } elseif ($user->role === 'manager_keuangan') {
+            $filenameParts[] = 'Keuangan';
+        } elseif ($user->role === 'manager_operasional') {
+            $filenameParts[] = 'Operasional';
+        } else {
+            $filenameParts[] = 'Semua_Divisi';
+        }
+
+        // Filter status
+        if ($request->filled('status')) {
+            $statusLabels = [
+                'menunggu' => 'Menunggu',
+                'diproses' => 'Diproses',
+                'menunggu_validasi_cc' => 'Menunggu_Validasi_CC',
+                'selesai' => 'Selesai',
+                'ditolak' => 'Ditolak',
+            ];
+
+            $filenameParts[] = $statusLabels[$request->status]
+                ?? $request->status;
+        }
+
+        // Filter bulan
+        if ($request->filled('month')) {
+            $filenameParts[] = Carbon::create()
+                ->month((int) $request->month)
+                ->locale('id')
+                ->translatedFormat('F');
+        }
+
+        // Filter tahun
+        if ($request->filled('year')) {
+            $filenameParts[] = $request->year;
+        }
+
+        // Tanggal export
+        $filenameParts[] = now()->format('Ymd');
+
+        $filename = implode('_', $filenameParts) . '.xlsx';
 
         return Excel::download(
             new ComplaintExport($query),

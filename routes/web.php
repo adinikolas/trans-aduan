@@ -5,6 +5,7 @@ use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ExportController;
 use Illuminate\Support\Facades\Route;
 
 // ============================================================
@@ -79,6 +80,13 @@ Route::middleware('auth')->group(function () {
     // Rekap Ulasan Pengguna - Internal
     Route::get('/ulasan-pengguna', [ComplaintController::class, 'indexFeedback'])
         ->name('feedback.index');
+
+    // Report / Export Excel
+    Route::get('/laporan', [ExportController::class, 'index'])
+        ->name('reports.index');
+
+    Route::get('/laporan/export', [ExportController::class, 'export'])
+        ->name('reports.export');
 
     // ========================================================
     // BERITA - CC ROOM

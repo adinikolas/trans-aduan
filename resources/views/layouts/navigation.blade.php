@@ -124,6 +124,19 @@
                         </a>
                     @endif
 
+                    {{-- LAPORAN UNTUK INTERNAL --}}
+                    @if (in_array($role, $internalRoles, true))
+                        <a
+                            href="{{ route('reports.index') }}"
+                            class="inline-flex h-16 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-200
+                            {{ request()->routeIs('reports.*')
+                                ? 'border-[#C8102E] text-slate-900 dark:text-white'
+                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200' }}"
+                        >
+                            Laporan
+                        </a>
+                    @endif
+
                     {{-- ULASAN PENGGUNA UNTUK INTERNAL --}}
                     @if (in_array($role, $internalRoles, true))
                         <a
@@ -352,6 +365,20 @@
                         : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
                 >
                     Aduan Saya
+                </a>
+            @endif
+
+            {{-- LAPORAN UNTUK INTERNAL --}}
+            @if (in_array($role, $internalRoles, true))
+                <a
+                    href="{{ route('reports.index') }}"
+                    @click="open = false"
+                    class="block rounded-xl px-4 py-3 text-sm font-medium transition
+                    {{ request()->routeIs('reports.*')
+                        ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
+                >
+                    Laporan
                 </a>
             @endif
 

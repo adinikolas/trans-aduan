@@ -8,6 +8,7 @@ use App\Models\ComplaintHistory;
 use App\Models\Feedback;
 use App\Models\News;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 
 class ComplaintController extends Controller
@@ -716,6 +717,7 @@ class ComplaintController extends Controller
         }
 
         $categories = Category::with('division')
+            ->where('is_active', true)
             ->orderBy('division_id')
             ->orderBy('name')
             ->get();
@@ -743,7 +745,11 @@ class ComplaintController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => [
+                'required',
+                \Illuminate\Validation\Rule::exists('categories', 'id')
+                    ->where('is_active', true),
+            ],
             'incident_time' => 'required|date',
             'location' => 'required|string|max:255',
             'bus_number' => 'nullable|string|max:50',

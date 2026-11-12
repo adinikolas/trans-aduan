@@ -4,6 +4,7 @@ use App\Models\News;
 use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 // ============================================================
@@ -103,6 +104,34 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{news}', [NewsController::class, 'destroy'])
             ->name('destroy');
     });
+
+    // ========================================================
+    // MASTER KATEGORI - CC ROOM
+    // ========================================================
+
+    Route::prefix('cc-room/kategori')
+        ->name('categories.')
+        ->controller(CategoryController::class)
+        ->group(function () {
+
+            Route::get('/', 'index')
+                ->name('index');
+
+            Route::get('/buat', 'create')
+                ->name('create');
+
+            Route::post('/', 'store')
+                ->name('store');
+
+            Route::get('/{category}/edit', 'edit')
+                ->name('edit');
+
+            Route::put('/{category}', 'update')
+                ->name('update');
+
+            Route::patch('/{category}/status', 'toggleStatus')
+                ->name('toggle-status');
+        });
 
     // ========================================================
     // MANAGER KEUANGAN

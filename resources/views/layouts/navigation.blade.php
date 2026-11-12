@@ -101,6 +101,16 @@
                             Kelola Berita
                         </a>
 
+                        <a
+                            href="{{ route('categories.index') }}"
+                            class="inline-flex h-16 items-center border-b-2 px-1 text-sm font-medium transition-colors duration-200
+                            {{ request()->routeIs('categories.*')
+                                ? 'border-[#C8102E] text-slate-900 dark:text-white'
+                                : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200' }}"
+                        >
+                            Master Kategori
+                        </a>
+
                     {{-- PENGGUNA --}}
                     @else
                         <a
@@ -318,6 +328,17 @@
                         : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
                 >
                     Kelola Berita
+                </a>
+
+                <a
+                    href="{{ route('categories.index') }}"
+                    @click="open = false"
+                    class="block rounded-xl px-4 py-3 text-sm font-medium transition
+                    {{ request()->routeIs('categories.*')
+                        ? 'bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white'
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white' }}"
+                >
+                    Master Kategori
                 </a>
 
             {{-- MENU PENGGUNA --}}

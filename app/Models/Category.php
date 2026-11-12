@@ -12,6 +12,11 @@ class Category extends Model
     protected $fillable = [
         'name',
         'division_id',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function division()

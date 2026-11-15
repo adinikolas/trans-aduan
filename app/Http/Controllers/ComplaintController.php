@@ -648,34 +648,6 @@ class ComplaintController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | JENIS ADUAN MANAGER KEUANGAN
-    |--------------------------------------------------------------------------
-    */
-
-    public function jenisAduanManagerKeuangan()
-    {
-        return $this->jenisAduanManager(
-            'manager_keuangan',
-            'manager.keuangan.jenis_aduan'
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | JENIS ADUAN MANAGER OPERASIONAL
-    |--------------------------------------------------------------------------
-    */
-
-    public function jenisAduanManagerOperasional()
-    {
-        return $this->jenisAduanManager(
-            'manager_operasional',
-            'manager.operasional.jenis_aduan'
-        );
-    }
-
-    /*
-    |--------------------------------------------------------------------------
     | DATA JENIS ADUAN MANAGER
     |--------------------------------------------------------------------------
     */

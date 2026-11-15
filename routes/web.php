@@ -151,9 +151,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/manager/keuangan/aduan', [ComplaintController::class, 'aduanManagerKeuangan'])
         ->name('manager.keuangan.aduan');
 
-    Route::get('/manager/keuangan/jenis-aduan', [ComplaintController::class, 'jenisAduanManagerKeuangan'])
-        ->name('manager.keuangan.jenis');
-
     // ========================================================
     // MANAGER OPERASIONAL
     // ========================================================
@@ -163,9 +160,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/manager/operasional/aduan', [ComplaintController::class, 'aduanManagerOperasional'])
         ->name('manager.operasional.aduan');
-
-    Route::get('/manager/operasional/jenis-aduan', [ComplaintController::class, 'jenisAduanManagerOperasional'])
-        ->name('manager.operasional.jenis');
 });
 
 // ============================================================

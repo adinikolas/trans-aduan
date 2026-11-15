@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Edit Berita">
     <x-slot name="header">
         <div class="flex items-center justify-between gap-4">
             <div>

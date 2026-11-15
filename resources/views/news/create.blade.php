@@ -27,7 +27,7 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-8">
+            <div class="rounded-2xl border border-gray-200 bg-white px-6 pt-3 pb-8 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:px-8 sm:pt-3 sm:pb-8">
 
                 @if ($errors->any())
                     <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -113,6 +113,7 @@
                             Simpan Berita
                         </button>
                     </div>
+                    <div class="h-3"></div>
                 </form>
             </div>
         </div>

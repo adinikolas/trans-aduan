@@ -21,22 +21,13 @@
             @endif
 
             {{-- RINGKASAN --}}
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                     <p class="text-sm text-slate-500 dark:text-slate-400">
                         Total Ulasan
                     </p>
                     <p class="mt-2 text-3xl font-bold text-slate-900 dark:text-white">
                         {{ $complaints->total() }}
-                    </p>
-                </div>
-
-                <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                    <p class="text-sm text-slate-500 dark:text-slate-400">
-                        Halaman Saat Ini
-                    </p>
-                    <p class="mt-2 text-3xl font-bold text-slate-900 dark:text-white">
-                        {{ $complaints->currentPage() }}
                     </p>
                 </div>
 

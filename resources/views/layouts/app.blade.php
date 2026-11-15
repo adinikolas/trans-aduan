@@ -1,3 +1,5 @@
+@props(['title' => 'Dashboard'])
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -13,7 +15,7 @@
     >
 
     <title>
-        @yield('title', 'Dashboard') - {{ config('app.name', 'Sistem Aduan Trans Semarang') }}
+        {{ $title }} - {{ config('app.name', 'Sistem Aduan Trans Semarang') }}
     </title>
 
     {{-- Fonts --}}

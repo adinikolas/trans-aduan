@@ -5,7 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Login Internal - Sistem Aduan Trans Semarang</title>
+    <title>
+        Login Internal - {{ config('app.name', 'Sistem Aduan Trans Semarang') }}
+    </title>
 
     <script>
         const savedTheme = localStorage.getItem('theme');

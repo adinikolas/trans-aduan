@@ -13,7 +13,7 @@
     >
 
     <title>
-        {{ config('app.name', 'Sistem Aduan Trans Semarang') }}
+        @yield('title', 'Dashboard') - {{ config('app.name', 'Sistem Aduan Trans Semarang') }}
     </title>
 
     {{-- Fonts --}}

@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-app-layout title="Laporan Aduan Operasional">
 
     <x-slot name="header">
         <div>

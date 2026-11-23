@@ -28,9 +28,13 @@
             <div class="flex items-center">
                 <a
                     href="{{ $dashboardRoute }}"
-                    class="flex h-10 w-10 shrink-0 items-center justify-center"
+                    class="flex shrink-0 items-center gap-2"
                 >
                     <x-application-logo class="h-9 w-9 object-contain" />
+
+                    <span class="whitespace-nowrap text-sm font-bold tracking-wide text-slate-900 dark:text-white">
+                        TRANS SEMARANG
+                    </span>
                 </a>
 
                 <div class="hidden h-16 sm:ms-10 sm:flex sm:items-center sm:gap-8">

@@ -50,7 +50,7 @@
                         <x-application-logo class="h-10 w-10" />
                     </div>
 
-                    <div class="hidden sm:block">
+                    <div class="block">
                         <div class="text-sm font-semibold text-slate-900 dark:text-white">
                             TRANS SEMARANG
                         </div>
